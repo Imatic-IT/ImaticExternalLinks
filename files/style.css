@@ -1,0 +1,185 @@
+/* ImaticExternalLinks — issue section styles. Loaded via <link> (see the plugin
+   injectAssets hook); kept framework-light to blend with Mantis' Ace theme. */
+
+.imatic-el {
+    padding: 10px 14px;
+}
+
+.imatic-el-loading,
+.imatic-el-empty {
+    color: #888;
+    font-style: italic;
+    padding: 6px 0;
+}
+
+.imatic-el-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+/* Type filter sits inline, right after the add buttons. */
+.imatic-el-filter {
+    width: auto;
+}
+
+.imatic-el-error {
+    cursor: pointer;
+    margin: 8px 0;
+    padding: 6px 10px;
+}
+
+.imatic-el-inline-error {
+    color: #b94a48;
+    font-size: 12px;
+    margin: 4px 0;
+}
+
+/* Add form */
+.imatic-el-add-form {
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    padding: 10px 12px;
+}
+
+.imatic-el-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.imatic-el-field label {
+    flex: 0 0 130px;
+    margin: 0;
+    font-weight: 600;
+}
+
+.imatic-el-field input {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.imatic-el-form-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+/* List */
+.imatic-el-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.imatic-el-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 4px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.imatic-el-row:last-child {
+    border-bottom: none;
+}
+
+.imatic-el-row-icon {
+    flex: 0 0 auto;
+    color: #6a8bad;
+    font-size: 16px;
+    width: 18px;
+    text-align: center;
+}
+
+.imatic-el-row-main {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.imatic-el-row-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.imatic-el-row-desc {
+    color: #888;
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.imatic-el-row-actions {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.imatic-el-action i {
+    margin-right: 3px;
+}
+
+/* Customer rows + picker (Phase 3b) */
+.imatic-el-row-props {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    font-size: 12px;
+    color: #666;
+    margin-top: 2px;
+}
+
+.imatic-el-prop-label {
+    font-weight: 600;
+}
+
+.imatic-el-customer-picker {
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    padding: 10px 12px;
+}
+
+.imatic-el-customer-results {
+    list-style: none;
+    margin: 6px 0 0;
+    padding: 0;
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+.imatic-el-customer-result {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    border-bottom: 1px solid #f0f0f0;
+    padding: 6px 4px;
+    cursor: pointer;
+}
+
+.imatic-el-customer-result:hover {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.imatic-el-customer-name {
+    font-weight: 600;
+}
+
+.imatic-el-customer-ico {
+    font-size: 12px;
+    color: #888;
+}

@@ -1,0 +1,39 @@
+<?php
+
+$s_plugin_ImaticExternalLinks_title       = 'External links';
+$s_plugin_ImaticExternalLinks_description = 'Attach links to external objects (Nextcloud, URLs) to an issue.';
+
+$s_imatic_el_section_title = 'External links';
+$s_imatic_el_loading       = 'Loading links…';
+$s_imatic_el_empty         = 'No external links yet.';
+
+$s_imatic_el_add_btn       = 'Add link';
+$s_imatic_el_save          = 'Save';
+$s_imatic_el_cancel        = 'Cancel';
+$s_imatic_el_delete        = 'Delete';
+$s_imatic_el_refresh       = 'Refresh';
+$s_imatic_el_confirm_delete = 'Remove this link?';
+
+$s_imatic_el_url_label          = 'URL';
+$s_imatic_el_url_placeholder    = 'https://…';
+$s_imatic_el_description_label  = 'Description (optional)';
+
+$s_imatic_el_action_open        = 'Open';
+$s_imatic_el_action_open_editor = 'Open in editor';
+$s_imatic_el_action_open_customer = 'Open customer';
+
+$s_imatic_el_add_customer_btn            = 'Attach customer';
+$s_imatic_el_customer_search_placeholder = 'Search customer…';
+$s_imatic_el_customer_ico                = 'Reg. no. (IČO)';
+$s_imatic_el_customer_dic                = 'VAT no. (DIČ)';
+$s_imatic_el_customer_invoice_email      = 'Invoice e-mail';
+$s_imatic_el_customer_pohoda_id          = 'Pohoda ID';
+$s_imatic_el_customer_all_attached       = 'All matching customers are already attached.';
+
+$s_imatic_el_filter_all       = 'All';
+$s_imatic_el_filter_customer  = 'Customers';
+$s_imatic_el_filter_link      = 'Links';
+
+$s_imatic_el_error_generic      = 'Something went wrong.';
+$s_imatic_el_error_invalid_url  = 'Please enter a valid http(s) URL.';
+$s_imatic_el_error_duplicate    = 'This link is already attached to the issue.';

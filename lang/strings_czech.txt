@@ -1,0 +1,39 @@
+<?php
+
+$s_plugin_ImaticExternalLinks_title       = 'Externí odkazy';
+$s_plugin_ImaticExternalLinks_description = 'Připojení odkazů na externí objekty (Nextcloud, URL) k úkolu.';
+
+$s_imatic_el_section_title = 'Externí odkazy';
+$s_imatic_el_loading       = 'Načítání odkazů…';
+$s_imatic_el_empty         = 'Zatím žádné externí odkazy.';
+
+$s_imatic_el_add_btn       = 'Přidat odkaz';
+$s_imatic_el_save          = 'Uložit';
+$s_imatic_el_cancel        = 'Zrušit';
+$s_imatic_el_delete        = 'Smazat';
+$s_imatic_el_refresh       = 'Obnovit';
+$s_imatic_el_confirm_delete = 'Odebrat tento odkaz?';
+
+$s_imatic_el_url_label          = 'URL';
+$s_imatic_el_url_placeholder    = 'https://…';
+$s_imatic_el_description_label  = 'Popis (nepovinné)';
+
+$s_imatic_el_action_open        = 'Otevřít';
+$s_imatic_el_action_open_editor = 'Otevřít v editoru';
+$s_imatic_el_action_open_customer = 'Otevřít zákazníka';
+
+$s_imatic_el_add_customer_btn            = 'Připojit zákazníka';
+$s_imatic_el_customer_search_placeholder = 'Hledat zákazníka…';
+$s_imatic_el_customer_ico                = 'IČO';
+$s_imatic_el_customer_dic                = 'DIČ';
+$s_imatic_el_customer_invoice_email      = 'Fakturační e-mail';
+$s_imatic_el_customer_pohoda_id          = 'Pohoda ID';
+$s_imatic_el_customer_all_attached       = 'Všichni nalezení zákazníci jsou už připojeni.';
+
+$s_imatic_el_filter_all       = 'Vše';
+$s_imatic_el_filter_customer  = 'Zákazníci';
+$s_imatic_el_filter_link      = 'Odkazy';
+
+$s_imatic_el_error_generic      = 'Něco se pokazilo.';
+$s_imatic_el_error_invalid_url  = 'Zadejte platnou http(s) URL adresu.';
+$s_imatic_el_error_duplicate    = 'Tento odkaz už je k problému připojen.';
