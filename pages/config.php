@@ -272,25 +272,15 @@ print_manage_menu('manage_plugin_page.php');
 </div>
 </div>
 
-<script>
-// Dependency-free substring filter over each enabled-projects multi-select, so a
-// long project list stays usable without pulling in a picker library.
-(function () {
-    var filters = document.querySelectorAll('.imatic-el-project-filter');
-    Array.prototype.forEach.call(filters, function (filter) {
-        var select = document.getElementById(filter.getAttribute('data-target'));
-        if (!select) {
-            return;
-        }
-        filter.addEventListener('input', function () {
-            var query = filter.value.trim().toLowerCase();
-            Array.prototype.forEach.call(select.options, function (option) {
-                option.hidden = query !== '' && option.text.toLowerCase().indexOf(query) === -1;
-            });
-        });
-    });
-})();
-</script>
+<?php
+// External file (not inline) so it passes the Mantis CSP (script-src 'self');
+// cache-busted by file mtime like the issue-view assets.
+$t_cfg_js      = plugin_file('config.js');
+$t_cfg_js_path = plugin_file_path('config.js', plugin_get_current());
+$t_cfg_js_ver  = $t_cfg_js_path !== false && is_file($t_cfg_js_path) ? filemtime($t_cfg_js_path) : '';
+$t_cfg_js_sep  = strpos($t_cfg_js, '?') !== false ? '&' : '?';
+?>
+<script src="<?php echo htmlspecialchars($t_cfg_js . $t_cfg_js_sep . 'v=' . $t_cfg_js_ver, ENT_QUOTES, 'UTF-8') ?>"></script>
 
 <?php
 layout_page_end();
