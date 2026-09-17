@@ -54,6 +54,7 @@ if (!function_exists('imatic_el_container')) {
         $t_customers_pid    = (int) plugin_config_get(ImaticExternalLinksPlugin::CFG_CUSTOMERS_PROJECT);
         $t_customer_fields  = (array) plugin_config_get(ImaticExternalLinksPlugin::CFG_CUSTOMER_FIELDS);
         $t_customer_enabled = (array) plugin_config_get(ImaticExternalLinksPlugin::CFG_CUSTOMER_ENABLED_PROJECTS);
+        $t_links_enabled    = (array) plugin_config_get(ImaticExternalLinksPlugin::CFG_LINKS_ENABLED_PROJECTS);
         $t_relation_defs    = (array) plugin_config_get(ImaticExternalLinksPlugin::CFG_RELATION_DEFINITIONS);
 
         // Enrichment allow-list: explicit proxy list, or fall back to the NC
@@ -131,6 +132,18 @@ if (!function_exists('imatic_el_container')) {
         // here → empty search results + hidden button, never an error).
         $t_customer_picker = new CustomerPickerService($t_access, $t_picker_gw);
 
-        return $container = new Container($t_access, $t_service, $t_customer_picker, new JsonResponder());
+        // "Add link" is offered on all projects by default; an explicit list
+        // restricts it. Same failing-closed semantics as the customer flow: an
+        // unknown current project (0) is offered only when the list is empty.
+        $t_links_offered = $t_links_enabled === []
+            || in_array($t_current_project, array_map('intval', $t_links_enabled), true);
+
+        return $container = new Container(
+            $t_access,
+            $t_service,
+            $t_customer_picker,
+            new JsonResponder(),
+            $t_links_offered
+        );
     }
 }

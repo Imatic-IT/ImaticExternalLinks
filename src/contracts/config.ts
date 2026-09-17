@@ -11,6 +11,8 @@ export const RuntimeConfigSchema = z.object({
   customerSearchUrl: z.string().default(''),
   /** Whether the customers project is configured (shows the "add customer" flow). */
   customersEnabled: z.boolean().default(false),
+  /** Whether the "add link" flow is offered on the current project. */
+  linksEnabled: z.boolean().default(true),
   bugId: z.number().int().positive(),
   canManage: z.boolean(),
   csrfToken: z.string(),

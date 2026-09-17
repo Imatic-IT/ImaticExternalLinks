@@ -32,6 +32,8 @@ class ImaticExternalLinksPlugin extends MantisPlugin
     public const CFG_CUSTOMER_FIELDS   = 'customer_fields';
     /** Project ids where the "add customer" flow is offered ([] = everywhere). */
     public const CFG_CUSTOMER_ENABLED_PROJECTS = 'customer_enabled_projects';
+    /** Project ids where the "add link" flow is offered ([] = everywhere). */
+    public const CFG_LINKS_ENABLED_PROJECTS = 'links_enabled_projects';
     /**
      * Configurable relation-type definitions (see Domain\RelationConfig). Each
      * entry names a type: {key, provider, label, enabled_projects,
@@ -72,6 +74,7 @@ class ImaticExternalLinksPlugin extends MantisPlugin
                 'contact'       => 'Fakturační kontakt',
             ],
             self::CFG_CUSTOMER_ENABLED_PROJECTS => [],
+            self::CFG_LINKS_ENABLED_PROJECTS    => [],
             self::CFG_RELATION_DEFINITIONS => [],
         ];
     }
@@ -153,6 +156,7 @@ class ImaticExternalLinksPlugin extends MantisPlugin
                 'ajaxUrl'           => plugin_page('ajax_links.php'),
                 'customerSearchUrl' => plugin_page('ajax_customer_search.php'),
                 'customersEnabled'  => $t_container->customerPicker->isEnabled(),
+                'linksEnabled'      => $t_container->linksEnabled,
                 'bugId'             => $t_bug_id,
                 'canManage'         => $t_container->access->canManage($t_bug_id),
                 'csrfToken'         => form_security_token(self::CSRF_FORM),

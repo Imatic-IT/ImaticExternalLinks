@@ -47,6 +47,24 @@ function imatic_el_parse_map(string $raw): array
     return $t_out;
 }
 
+/**
+ * Sanitise a posted list of project ids to unique positive ints.
+ *
+ * @param array<int|string,mixed> $raw
+ * @return array<int,int>
+ */
+function imatic_el_sanitize_pids(array $raw): array
+{
+    $t_out = [];
+    foreach ($raw as $t_pid) {
+        $t_pid = (int) $t_pid;
+        if ($t_pid > 0 && !in_array($t_pid, $t_out, true)) {
+            $t_out[] = $t_pid;
+        }
+    }
+    return $t_out;
+}
+
 if (gpc_get_bool('save', false)) {
     form_security_validate('plugin_imatic_external_links_config');
 
@@ -73,17 +91,16 @@ if (gpc_get_bool('save', false)) {
     plugin_config_set(ImaticExternalLinksPlugin::CFG_CUSTOMERS_PROJECT, gpc_get_int('customers_project_id', 0));
     plugin_config_set(ImaticExternalLinksPlugin::CFG_CUSTOMER_FIELDS, imatic_el_parse_map(gpc_get_string('customer_fields', '')));
 
-    // Projects where the "add customer" flow is offered. Empty selection = every
-    // project (historical behaviour). Values are sanitised to positive ints.
-    $t_enabled_raw = gpc_get_int_array('customer_enabled_projects', []);
-    $t_enabled_pids = [];
-    foreach ($t_enabled_raw as $t_pid) {
-        $t_pid = (int) $t_pid;
-        if ($t_pid > 0 && !in_array($t_pid, $t_enabled_pids, true)) {
-            $t_enabled_pids[] = $t_pid;
-        }
-    }
-    plugin_config_set(ImaticExternalLinksPlugin::CFG_CUSTOMER_ENABLED_PROJECTS, $t_enabled_pids);
+    // Projects where the "add customer" / "add link" flows are offered. Empty
+    // selection = every project (historical behaviour).
+    plugin_config_set(
+        ImaticExternalLinksPlugin::CFG_CUSTOMER_ENABLED_PROJECTS,
+        imatic_el_sanitize_pids(gpc_get_int_array('customer_enabled_projects', []))
+    );
+    plugin_config_set(
+        ImaticExternalLinksPlugin::CFG_LINKS_ENABLED_PROJECTS,
+        imatic_el_sanitize_pids(gpc_get_int_array('links_enabled_projects', []))
+    );
 
     form_security_purge('plugin_imatic_external_links_config');
     print_successful_redirect(plugin_page('config', true));
@@ -99,6 +116,7 @@ $t_editor      = plugin_config_get(ImaticExternalLinksPlugin::CFG_NC_EDITOR);
 $t_customers_pid    = (int) plugin_config_get(ImaticExternalLinksPlugin::CFG_CUSTOMERS_PROJECT);
 $t_customer_fields  = (array) plugin_config_get(ImaticExternalLinksPlugin::CFG_CUSTOMER_FIELDS);
 $t_customer_enabled = array_map('intval', (array) plugin_config_get(ImaticExternalLinksPlugin::CFG_CUSTOMER_ENABLED_PROJECTS));
+$t_links_enabled    = array_map('intval', (array) plugin_config_get(ImaticExternalLinksPlugin::CFG_LINKS_ENABLED_PROJECTS));
 
 // Textarea seed: "key = value" lines for the field map.
 $t_fields_text = '';
@@ -214,14 +232,27 @@ print_manage_menu('manage_plugin_page.php');
                                 </td>
                             </tr>
                             <tr>
+                                <th class="category">Offer "add link" on</th>
+                                <td>
+                                    <input type="text" class="input-sm imatic-el-project-filter" autocomplete="off"
+                                           data-target="imatic-el-links-projects"
+                                           placeholder="Hledat projekt…" style="display:block;margin-bottom:4px;" />
+                                    <select name="links_enabled_projects[]" id="imatic-el-links-projects" multiple size="12" class="form-control">
+                                        <?php print_project_option_list($t_links_enabled, false) ?>
+                                    </select>
+                                    <span class="small">Projects where the "add link" button appears. Select none = every project.</span>
+                                </td>
+                            </tr>
+                            <tr>
                                 <th class="category">Offer "add customer" on</th>
                                 <td>
-                                    <select name="customer_enabled_projects[]" multiple size="6" class="form-control">
-                                        <?php foreach (project_get_all_rows() as $t_project): ?>
-                                            <option value="<?php echo (int) $t_project['id'] ?>"<?php echo in_array((int) $t_project['id'], $t_customer_enabled, true) ? ' selected' : '' ?>>
-                                                <?php echo htmlspecialchars($t_project['name'], ENT_QUOTES, 'UTF-8') ?>
-                                            </option>
-                                        <?php endforeach; ?>
+                                    <input type="text" class="input-sm imatic-el-project-filter" autocomplete="off"
+                                           data-target="imatic-el-customer-projects"
+                                           placeholder="Hledat projekt…" style="display:block;margin-bottom:4px;" />
+                                    <select name="customer_enabled_projects[]" id="imatic-el-customer-projects" multiple size="12" class="form-control">
+                                        <?php // Core helper: only accessible projects, ordered hierarchically with
+                                              // subprojects indented — same order as the project menu. ?>
+                                        <?php print_project_option_list($t_customer_enabled, false) ?>
                                     </select>
                                     <span class="small">Projects where the "add customer" button appears. Select none = every project.</span>
                                 </td>
@@ -240,6 +271,26 @@ print_manage_menu('manage_plugin_page.php');
     </div>
 </div>
 </div>
+
+<script>
+// Dependency-free substring filter over each enabled-projects multi-select, so a
+// long project list stays usable without pulling in a picker library.
+(function () {
+    var filters = document.querySelectorAll('.imatic-el-project-filter');
+    Array.prototype.forEach.call(filters, function (filter) {
+        var select = document.getElementById(filter.getAttribute('data-target'));
+        if (!select) {
+            return;
+        }
+        filter.addEventListener('input', function () {
+            var query = filter.value.trim().toLowerCase();
+            Array.prototype.forEach.call(select.options, function (option) {
+                option.hidden = query !== '' && option.text.toLowerCase().indexOf(query) === -1;
+            });
+        });
+    });
+})();
+</script>
 
 <?php
 layout_page_end();

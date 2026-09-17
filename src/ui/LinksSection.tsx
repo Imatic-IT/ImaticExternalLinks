@@ -79,7 +79,7 @@ export function LinksSection({ api, config, initial }: Props) {
     <div className="imatic-el">
       {(config.canManage || showFilter) && (
         <div className="imatic-el-toolbar">
-          {config.canManage && (
+          {config.canManage && config.linksEnabled && (
             <button
               type="button"
               className="btn btn-xs btn-primary btn-round"

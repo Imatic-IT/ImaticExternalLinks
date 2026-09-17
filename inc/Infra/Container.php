@@ -27,15 +27,20 @@ final class Container
     /** @var JsonResponder */
     public $responder;
 
+    /** @var bool whether the "add link" flow is offered on the current project */
+    public $linksEnabled;
+
     public function __construct(
         AccessGuard $access,
         LinkService $service,
         CustomerPickerService $customerPicker,
-        JsonResponder $responder
+        JsonResponder $responder,
+        bool $linksEnabled = true
     ) {
         $this->access         = $access;
         $this->service        = $service;
         $this->customerPicker = $customerPicker;
         $this->responder      = $responder;
+        $this->linksEnabled   = $linksEnabled;
     }
 }
