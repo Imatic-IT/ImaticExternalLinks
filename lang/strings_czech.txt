@@ -7,6 +7,8 @@ $s_imatic_el_section_title = 'Externí odkazy';
 $s_imatic_el_loading       = 'Načítání odkazů…';
 $s_imatic_el_empty         = 'Zatím žádné externí odkazy.';
 
+$s_imatic_el_backlinks_title = 'Napojené tikety';
+
 $s_imatic_el_add_btn       = 'Přidat odkaz';
 $s_imatic_el_save          = 'Uložit';
 $s_imatic_el_cancel        = 'Zrušit';
@@ -33,6 +35,11 @@ $s_imatic_el_customer_all_attached       = 'Všichni nalezení zákazníci jsou 
 $s_imatic_el_filter_all       = 'Vše';
 $s_imatic_el_filter_customer  = 'Zákazníci';
 $s_imatic_el_filter_link      = 'Odkazy';
+
+$s_imatic_rel_filter_placeholder = 'Filtrovat podle stavu…';
+$s_imatic_rel_show_all           = 'Zobrazit vše';
+$s_imatic_rel_only_active        = 'Jen aktivní';
+$s_imatic_rel_count              = 'Zobrazeno %shown% z %total%';
 
 $s_imatic_el_error_generic      = 'Něco se pokazilo.';
 $s_imatic_el_error_invalid_url  = 'Zadejte platnou http(s) URL adresu.';

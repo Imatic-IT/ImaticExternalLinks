@@ -223,6 +223,17 @@ final class FakeLinkRepository implements LinkRepository
         return ($row !== null && $row['bug_id'] === $bugId) ? $row : null;
     }
 
+    public function findByUrl(string $url): array
+    {
+        $out = [];
+        foreach ($this->rows as $row) {
+            if ($row['url'] === $url) {
+                $out[] = $row;
+            }
+        }
+        return $out;
+    }
+
     public function delete(int $bugId, int $linkId): bool
     {
         if (isset($this->rows[$linkId]) && $this->rows[$linkId]['bug_id'] === $bugId) {
@@ -609,6 +620,16 @@ $custSvc->add(500, 'customer://99', null);
 $custSvc->add(501, 'customer://12', null);
 eq(2, count($custRepo->findByBug(500)), 'add: distinct customer on same bug allowed');
 eq(1, count($custRepo->findByBug(501)), 'add: same customer on a different bug allowed');
+
+// Backlinks: customer 12 is now referenced by bugs 500 and 501 (distinct,
+// ascending); customer 99 only by bug 500; an unreferenced customer is empty.
+eq([500, 501], $custSvc->customerBacklinks(12), 'backlinks: both referencing bugs, deduped + ascending');
+eq([500], $custSvc->customerBacklinks(99), 'backlinks: single referencing bug');
+eq([], $custSvc->customerBacklinks(7777), 'backlinks: none for an unreferenced customer');
+eq([], $custSvc->customerBacklinks(0), 'backlinks: non-positive id yields nothing');
+// Access filter: a guard that denies view hides every backlink.
+$blDenied = new LinkService($custRepo, el_registry(), new FakeAccessGuard(false, false, 7));
+eq([], $blDenied->customerBacklinks(12), 'backlinks: view-denied issues are filtered out');
 
 // ─── LinkService ─────────────────────────────────────────────────────────────
 

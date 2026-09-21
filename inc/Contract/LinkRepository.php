@@ -39,6 +39,15 @@ interface LinkRepository
      */
     public function find(int $bugId, int $linkId): ?array;
 
+    /**
+     * All links whose canonical URL matches exactly, across every bug. Used to
+     * find the issues that point at a given target (e.g. a customer issue's
+     * backlinks via its `customer://<id>` URL). Ordered by bug id.
+     *
+     * @return array<int,array<string,mixed>>
+     */
+    public function findByUrl(string $url): array;
+
     /** Delete a link scoped to its bug. Returns false when nothing matched. */
     public function delete(int $bugId, int $linkId): bool;
 

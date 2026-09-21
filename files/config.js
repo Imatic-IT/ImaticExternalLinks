@@ -1,19 +1,21 @@
-// Dependency-free substring filter over each enabled-projects multi-select on the
-// plugin config page. Loaded as an external file (not inline) so it passes the
-// Mantis Content-Security-Policy, which blocks inline scripts (script-src 'self').
+// Turns the enabled-projects multi-selects on the plugin config page into
+// searchable select2 tag pickers. Loaded as an external file (not inline) so it
+// passes the Mantis Content-Security-Policy, which blocks inline scripts
+// (script-src 'self'). jQuery and select2 are already loaded on the page.
 (function () {
     function init() {
-        var filters = document.querySelectorAll('.imatic-el-project-filter');
-        Array.prototype.forEach.call(filters, function (filter) {
-            var select = document.getElementById(filter.getAttribute('data-target'));
-            if (!select) {
-                return;
-            }
-            filter.addEventListener('input', function () {
-                var query = filter.value.trim().toLowerCase();
-                Array.prototype.forEach.call(select.options, function (option) {
-                    option.hidden = query !== '' && option.text.toLowerCase().indexOf(query) === -1;
-                });
+        if (typeof jQuery === 'undefined' || typeof jQuery.fn.select2 === 'undefined') {
+            return;
+        }
+        jQuery('.imatic-el-project-select').each(function () {
+            var $select = jQuery(this);
+            $select.select2({
+                width: '100%',
+                allowClear: true,
+                placeholder: $select.data('placeholder') || '',
+                // Mantis renders subprojects with a leading indent in the option
+                // text; keep it as-is so the hierarchy stays readable.
+                dropdownParent: $select.parent()
             });
         });
     }

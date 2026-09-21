@@ -162,6 +162,8 @@ class ImaticExternalLinksPlugin extends MantisPlugin
                 'csrfToken'         => form_security_token(self::CSRF_FORM),
                 'csrfField'         => self::CSRF_FORM . '_token',
                 'lang'              => $this->langStrings(),
+                'backlinks'         => $this->backlinks($t_container, $t_bug_id),
+                'relStatuses'       => $this->relationshipStatuses($t_bug_id),
             ];
 
             $t_json = json_encode($t_config, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
@@ -179,6 +181,57 @@ class ImaticExternalLinksPlugin extends MantisPlugin
     }
 
     /**
+     * Issues that link to the current one — only on a customer issue (an issue
+     * in the customers project). Resolved and access-filtered by the service;
+     * here we decorate each id with a view URL, label and status name for the
+     * "Linked issues" tab. Empty everywhere else, so the tab stays hidden.
+     *
+     * @return array<int,array<string,mixed>>
+     */
+    private function backlinks($container, int $bugId): array
+    {
+        $t_customers_pid = (int) plugin_config_get(self::CFG_CUSTOMERS_PROJECT);
+        if ($t_customers_pid <= 0 || (int) bug_get_field($bugId, 'project_id') !== $t_customers_pid) {
+            return [];
+        }
+
+        $t_out = [];
+        foreach ($container->service->customerBacklinks($bugId) as $t_id) {
+            $t_out[] = [
+                'id'     => $t_id,
+                'url'    => string_get_bug_view_url($t_id),
+                'label'  => bug_format_id($t_id) . ' – ' . bug_get_field($t_id, 'summary'),
+                'status' => get_enum_element('status', (int) bug_get_field($t_id, 'status')),
+            ];
+        }
+        return $t_out;
+    }
+
+    /**
+     * Status enum for the current bug's project, tagged with whether each value
+     * counts as resolved/closed. The relationships-filter enhancement uses this
+     * to hide closed rows by default and to build the status picker; labels match
+     * the text the core relationships table renders in `.issue-status`.
+     *
+     * @return array<int,array<string,mixed>>
+     */
+    private function relationshipStatuses(int $bugId): array
+    {
+        $t_project  = (int) bug_get_field($bugId, 'project_id');
+        $t_resolved = (int) config_get('bug_resolved_status_threshold', null, null, $t_project);
+        $t_enum     = config_get('status_enum_string', null, null, $t_project);
+
+        $t_out = [];
+        foreach (MantisEnum::getValues($t_enum) as $t_val) {
+            $t_out[] = [
+                'label'  => get_enum_element('status', $t_val, null, $t_project),
+                'closed' => (int) $t_val >= $t_resolved,
+            ];
+        }
+        return $t_out;
+    }
+
+    /**
      * Translated UI strings handed to the frontend so all copy lives in the
      * plugin's lang files (single source of truth) rather than being duplicated
      * in TypeScript. Action labels are the same keys providers emit.
@@ -188,6 +241,8 @@ class ImaticExternalLinksPlugin extends MantisPlugin
     private function langStrings(): array
     {
         $t_keys = [
+            'imatic_el_section_title',
+            'imatic_el_backlinks_title',
             'imatic_el_empty',
             'imatic_el_add_btn',
             'imatic_el_save',
@@ -211,6 +266,10 @@ class ImaticExternalLinksPlugin extends MantisPlugin
             'imatic_el_filter_all',
             'imatic_el_filter_customer',
             'imatic_el_filter_link',
+            'imatic_rel_filter_placeholder',
+            'imatic_rel_show_all',
+            'imatic_rel_only_active',
+            'imatic_rel_count',
             'imatic_el_error_generic',
             'imatic_el_error_invalid_url',
         ];

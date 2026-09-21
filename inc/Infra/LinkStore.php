@@ -76,6 +76,21 @@ final class LinkStore implements LinkRepository
         return $t_row === false ? null : $this->hydrate($t_row);
     }
 
+    public function findByUrl(string $url): array
+    {
+        db_param_push();
+        $t_result = db_query(
+            'SELECT * FROM ' . $this->table . ' WHERE url = ' . db_param() . ' ORDER BY bug_id ASC, id ASC',
+            [$url]
+        );
+
+        $t_rows = [];
+        while ($t_row = db_fetch_array($t_result)) {
+            $t_rows[] = $this->hydrate($t_row);
+        }
+        return $t_rows;
+    }
+
     public function delete(int $bugId, int $linkId): bool
     {
         db_param_push();

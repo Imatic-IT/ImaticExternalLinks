@@ -33,6 +33,14 @@ export function LinksSection({ api, config, initial }: Props) {
   const [adding, setAdding] = useState(false);
   const [pickingCustomer, setPickingCustomer] = useState(false);
   const [filter, setFilter] = useState<'all' | 'customer' | 'link'>('all');
+  // Reverse references (issues linking to this customer). Only present on a
+  // customer issue; when there are none the tab bar stays hidden.
+  const backlinks = config.backlinks;
+  const showTabs = backlinks.length > 0;
+
+  // On a customer issue the linked issues are the point of the page, so open
+  // that tab first; elsewhere (no backlinks) the links tab is the only one.
+  const [tab, setTab] = useState<'links' | 'backlinks'>(showTabs ? 'backlinks' : 'links');
 
   // Customer ids already attached — kept out of the picker so the same customer
   // can't be added twice.
@@ -77,6 +85,37 @@ export function LinksSection({ api, config, initial }: Props) {
 
   return (
     <div className="imatic-el">
+      {showTabs && (
+        <ul className="imatic-el-tabs nav nav-tabs">
+          <li className={tab === 'links' ? 'active' : ''}>
+            <a href="#" onClick={(e) => { e.preventDefault(); setTab('links'); }}>
+              {t('imatic_el_section_title')}
+            </a>
+          </li>
+          <li className={tab === 'backlinks' ? 'active' : ''}>
+            <a href="#" onClick={(e) => { e.preventDefault(); setTab('backlinks'); }}>
+              {`${t('imatic_el_backlinks_title')} (${backlinks.length})`}
+            </a>
+          </li>
+        </ul>
+      )}
+
+      {tab === 'backlinks' ? (
+        <ul className="imatic-el-list imatic-el-backlinks">
+          {backlinks.map((row) => (
+            <li className="imatic-el-row" key={row.id}>
+              <span className="imatic-el-row-icon fa fa-link" aria-hidden="true" />
+              <span className="imatic-el-row-main">
+                <span className="imatic-el-row-title">
+                  <a href={row.url}>{row.label}</a>
+                </span>
+                {row.status !== '' && <span className="imatic-el-row-desc">{row.status}</span>}
+              </span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <>
       {(config.canManage || showFilter) && (
         <div className="imatic-el-toolbar">
           {config.canManage && config.linksEnabled && (
@@ -152,6 +191,8 @@ export function LinksSection({ api, config, initial }: Props) {
             />
           ))}
         </ul>
+      )}
+        </>
       )}
     </div>
   );

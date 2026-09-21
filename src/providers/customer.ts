@@ -28,6 +28,13 @@ export function customerIdOf(row: LinkRow): number | null {
 export const customerProvider: ClientProvider = {
   key: 'customer',
   rowIcon: () => 'fa-building-o',
+  titleHref(row: LinkRow): string | null {
+    // The canonical `customer://<id>` URL isn't linkable; the backend builds a
+    // real Mantis issue URL as the "open customer" action. Reuse it for the
+    // title so the customer name itself is the link (no redundant button).
+    const open = row.actions.find((action) => action.icon === 'customer');
+    return open ? open.url : null;
+  },
   properties(row: LinkRow): RowProperty[] {
     const out: RowProperty[] = [];
     for (const field of CUSTOMER_FIELDS) {

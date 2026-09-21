@@ -7,6 +7,8 @@ $s_imatic_el_section_title = 'External links';
 $s_imatic_el_loading       = 'Loading links…';
 $s_imatic_el_empty         = 'No external links yet.';
 
+$s_imatic_el_backlinks_title = 'Linked issues';
+
 $s_imatic_el_add_btn       = 'Add link';
 $s_imatic_el_save          = 'Save';
 $s_imatic_el_cancel        = 'Cancel';
@@ -33,6 +35,11 @@ $s_imatic_el_customer_all_attached       = 'All matching customers are already a
 $s_imatic_el_filter_all       = 'All';
 $s_imatic_el_filter_customer  = 'Customers';
 $s_imatic_el_filter_link      = 'Links';
+
+$s_imatic_rel_filter_placeholder = 'Filter by status…';
+$s_imatic_rel_show_all           = 'Show all';
+$s_imatic_rel_only_active        = 'Active only';
+$s_imatic_rel_count              = 'Showing %shown% of %total%';
 
 $s_imatic_el_error_generic      = 'Something went wrong.';
 $s_imatic_el_error_invalid_url  = 'Please enter a valid http(s) URL.';

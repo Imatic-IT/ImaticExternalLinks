@@ -19,6 +19,95 @@
     margin-bottom: 8px;
 }
 
+/* Links / linked-issues switch. Uses the Ace nav-tabs look; kept compact with
+   a clear gap before the toolbar/content below it. */
+.imatic-el .imatic-el-tabs.nav-tabs {
+    /* !important defeats the core theme's `.nav-tabs { margin: 0 }` once the
+       widget is nested inside #relationships. */
+    margin: 0 0 12px !important;
+}
+
+.imatic-el-tabs > li > a {
+    padding: 5px 14px;
+    cursor: pointer;
+}
+
+/* When nested inside the core Relationships box, shed the heavy blue widget-box
+   chrome and read as a light sub-section of "Relationships": a divider above to
+   separate it from the relationship add-row, a muted (not white-on-blue) title,
+   and no second card border/shadow. */
+.widget-box.imatic-el-nested {
+    margin: 14px 0 0;
+    border: none;
+    box-shadow: none;
+    background: transparent;
+    border-top: 1px solid #e0e3e8;
+    padding-top: 6px;
+}
+
+.widget-box.imatic-el-nested > .widget-header {
+    background: transparent;
+    border: none;
+    min-height: 0;
+    padding: 6px 14px 0;
+}
+
+.widget-box.imatic-el-nested > .widget-header .widget-title {
+    color: #3f4b5b;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    line-height: 1.4;
+}
+
+.widget-box.imatic-el-nested > .widget-header .widget-title > .fa {
+    color: #6b7889;
+}
+
+.widget-box.imatic-el-nested > .widget-body {
+    border: none;
+    background: transparent;
+}
+
+/* Status filter injected above the core "Relationships" table (issues with many
+   linked bugs). Sits between the add-relationship toolbox and the table. */
+.imatic-rel-filter {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    /* Spacing (not a divider line) separates it from the add-relationship row. */
+    margin: 14px 12px 14px;
+}
+
+.imatic-rel-filter-icon {
+    flex: 0 0 auto;
+    color: #97a3b3;
+}
+
+/* Constrain the widget select2 renders (the original <select> is hidden), so it
+   doesn't stretch to the full — potentially very wide — relationships table. */
+.imatic-rel-filter .imatic-rel-status,
+.imatic-rel-filter .select2-container {
+    flex: 0 1 460px;
+    min-width: 200px;
+    max-width: 460px;
+}
+
+.imatic-rel-filter-meta {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 12px;
+    color: #888;
+    white-space: nowrap;
+}
+
+.imatic-rel-toggle {
+    cursor: pointer;
+}
+
 /* Type filter sits inline, right after the add buttons. */
 .imatic-el-filter {
     width: auto;

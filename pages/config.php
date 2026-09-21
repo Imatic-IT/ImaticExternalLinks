@@ -234,10 +234,8 @@ print_manage_menu('manage_plugin_page.php');
                             <tr>
                                 <th class="category">Offer "add link" on</th>
                                 <td>
-                                    <input type="text" class="input-sm imatic-el-project-filter" autocomplete="off"
-                                           data-target="imatic-el-links-projects"
-                                           placeholder="Hledat projekt…" style="display:block;margin-bottom:4px;" />
-                                    <select name="links_enabled_projects[]" id="imatic-el-links-projects" multiple size="12" class="form-control">
+                                    <select name="links_enabled_projects[]" id="imatic-el-links-projects" multiple
+                                            class="form-control imatic-el-project-select" data-placeholder="Hledat projekt…">
                                         <?php print_project_option_list($t_links_enabled, false) ?>
                                     </select>
                                     <span class="small">Projects where the "add link" button appears. Select none = every project.</span>
@@ -246,10 +244,8 @@ print_manage_menu('manage_plugin_page.php');
                             <tr>
                                 <th class="category">Offer "add customer" on</th>
                                 <td>
-                                    <input type="text" class="input-sm imatic-el-project-filter" autocomplete="off"
-                                           data-target="imatic-el-customer-projects"
-                                           placeholder="Hledat projekt…" style="display:block;margin-bottom:4px;" />
-                                    <select name="customer_enabled_projects[]" id="imatic-el-customer-projects" multiple size="12" class="form-control">
+                                    <select name="customer_enabled_projects[]" id="imatic-el-customer-projects" multiple
+                                            class="form-control imatic-el-project-select" data-placeholder="Hledat projekt…">
                                         <?php // Core helper: only accessible projects, ordered hierarchically with
                                               // subprojects indented — same order as the project menu. ?>
                                         <?php print_project_option_list($t_customer_enabled, false) ?>
@@ -271,6 +267,14 @@ print_manage_menu('manage_plugin_page.php');
     </div>
 </div>
 </div>
+
+<?php
+// select2 (vendored locally so it loads from 'self' under the Mantis CSP) turns
+// the project multi-selects into searchable tag pickers — no cmd-click, and a
+// stray click can't wipe the whole selection.
+?>
+<link rel="stylesheet" type="text/css" href="<?php echo htmlspecialchars(plugin_file('vendor/select2.min.css'), ENT_QUOTES, 'UTF-8') ?>" />
+<script src="<?php echo htmlspecialchars(plugin_file('vendor/select2.full.min.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
 
 <?php
 // External file (not inline) so it passes the Mantis CSP (script-src 'self');

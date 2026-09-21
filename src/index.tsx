@@ -2,6 +2,7 @@ import { createRoot } from 'react-dom/client';
 import { LinksApi } from './api/links';
 import { RuntimeConfigSchema } from './contracts/config';
 import { LinkListSchema } from './contracts/link';
+import { enhanceRelationships } from './relationships/filter';
 import { LinksSection } from './ui/LinksSection';
 
 /**
@@ -34,28 +35,30 @@ function boot(): void {
   );
 
   positionUnderRelationships(mount);
+  enhanceRelationships(configResult.data);
 }
 
 /**
- * Relocate the whole "External links" widget to sit directly below the core
- * "Relationships" box, so a customer link (which is really a relation) reads as
- * part of that group. Pure DOM move against the stable `#relationships` id — no
- * core template changes. If the relationships box is absent (e.g. hidden), the
- * section is left in its original spot.
+ * Nest the "External links" widget inside the core "Relationships" box, so a
+ * customer link (which is really a relation) reads as a sub-panel of that group
+ * rather than a separate box at the bottom of the page. Pure DOM move against
+ * the stable `#relationships` id — no core template changes. If the
+ * relationships box is absent (e.g. hidden), the section stays in its original
+ * spot. The now-empty original column wrapper is dropped so no gap is left.
  */
 function positionUnderRelationships(mount: HTMLElement): void {
   const move = (): void => {
-    const ourBox = mount.closest<HTMLElement>('.col-md-12');
-    const relBox = document.getElementById('relationships')?.closest<HTMLElement>('.col-md-12');
-    if (
-      ourBox &&
-      relBox &&
-      relBox.parentNode &&
-      ourBox !== relBox &&
-      ourBox.previousElementSibling !== relBox // idempotent: already in place
-    ) {
-      relBox.parentNode.insertBefore(ourBox, relBox.nextSibling);
+    const ourWrapper = mount.closest<HTMLElement>('.col-md-12');
+    const ourBox = mount.closest<HTMLElement>('.widget-box');
+    const relBody = document
+      .getElementById('relationships')
+      ?.querySelector<HTMLElement>(':scope > .widget-body');
+    if (!ourWrapper || !ourBox || !relBody || relBody.contains(ourBox)) {
+      return; // missing pieces, or already nested (idempotent)
     }
+    ourBox.classList.add('imatic-el-nested');
+    relBody.appendChild(ourBox);
+    ourWrapper.remove();
   };
   // Run now and once more after the next frame, so late body-end scripts from
   // other plugins can't leave the box stranded in its original (bottom) slot.

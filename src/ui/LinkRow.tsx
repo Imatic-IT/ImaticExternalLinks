@@ -20,7 +20,8 @@ interface Props {
  * text; hrefs are additionally sanitised to http(s) only.
  */
 export function LinkRow({ row, provider, t, canManage, busy, onDelete, onRefresh }: Props) {
-  const primaryHref = safeHref(row.url);
+  const titleTarget = provider.titleHref ? provider.titleHref(row) : row.url;
+  const primaryHref = titleTarget ? safeHref(titleTarget) : null;
   const label = row.title && row.title.trim() !== '' ? row.title : row.url;
   const properties = provider.properties ? provider.properties(row) : [];
 
@@ -54,7 +55,9 @@ export function LinkRow({ row, provider, t, canManage, busy, onDelete, onRefresh
       <span className="imatic-el-row-actions">
         {row.actions.map((action, index) => {
           const href = safeHref(action.url);
-          if (!href) {
+          // Skip an action that already backs the title link (customer open),
+          // so the clickable name isn't duplicated by a redundant button.
+          if (!href || href === primaryHref) {
             return null;
           }
           return (

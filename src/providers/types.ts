@@ -22,4 +22,11 @@ export interface ClientProvider {
    * invoicing identifiers). Absent ⇒ nothing extra is shown.
    */
   properties?(row: LinkRow): RowProperty[];
+
+  /**
+   * Optional http(s) target for the title link when the canonical URL uses a
+   * synthetic scheme (e.g. `customer://<id>`) that can't be linked directly.
+   * Absent ⇒ the title links to the sanitised canonical URL, or renders as text.
+   */
+  titleHref?(row: LinkRow): string | null;
 }

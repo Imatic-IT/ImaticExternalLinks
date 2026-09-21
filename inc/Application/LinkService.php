@@ -10,6 +10,7 @@ use ImaticExternalLinks\Contract\LinkRepository;
 use ImaticExternalLinks\Domain\Exception\DuplicateLinkException;
 use ImaticExternalLinks\Domain\Exception\InvalidLinkException;
 use ImaticExternalLinks\Domain\LinkProvider;
+use ImaticExternalLinks\Domain\Provider\CustomerProvider;
 use ImaticExternalLinks\Domain\ProviderRegistry;
 
 /**
@@ -128,6 +129,32 @@ final class LinkService
             $t_links[] = $this->decorate($t_row, $this->providerFor($t_row));
         }
         return ['links' => $t_links];
+    }
+
+    /**
+     * Bug ids that link to the given customer issue — its backlinks, resolved
+     * from the canonical `customer://<id>` URL — filtered to those the current
+     * user may view. Orchestration only: the caller renders the issue summaries
+     * from Mantis core. Distinct, ascending (repo order).
+     *
+     * @return array<int,int>
+     */
+    public function customerBacklinks(int $customerBugId): array
+    {
+        if ($customerBugId <= 0) {
+            return [];
+        }
+
+        $t_url = CustomerProvider::urlForId($customerBugId);
+
+        $t_ids = [];
+        foreach ($this->store->findByUrl($t_url) as $t_row) {
+            $t_bug = (int) ($t_row['bug_id'] ?? 0);
+            if ($t_bug > 0 && !in_array($t_bug, $t_ids, true) && $this->access->canView($t_bug)) {
+                $t_ids[] = $t_bug;
+            }
+        }
+        return $t_ids;
     }
 
     /**
