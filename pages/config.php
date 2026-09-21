@@ -271,7 +271,7 @@ print_manage_menu('manage_plugin_page.php');
                             <tr>
                                 <th class="category">NC folders — per project</th>
                                 <td>
-                                    <div id="imatic-el-ncpf">
+                                    <div id="imatic-el-ncpf" data-browse-url="<?php echo htmlspecialchars(plugin_page('ajax_nc_config_browse.php'), ENT_QUOTES, 'UTF-8') ?>">
                                         <?php foreach ($t_nc_project_folders as $t_pf_pid => $t_pf_folder): ?>
                                             <div class="imatic-el-ncpf-row">
                                                 <select name="nc_pf_pid[]" class="imatic-el-ncpf-project" data-placeholder="Vyber projekt…">
@@ -281,12 +281,13 @@ print_manage_menu('manage_plugin_page.php');
                                                 <input type="text" name="nc_pf_path[]" class="imatic-el-ncpf-path form-control"
                                                        value="<?php echo htmlspecialchars((string) $t_pf_folder, ENT_QUOTES, 'UTF-8') ?>"
                                                        placeholder="/Zakaznici" />
+                                                <button type="button" class="btn btn-xs btn-white btn-round imatic-el-ncpf-browse" title="Procházet Nextcloud"><i class="ace-icon fa fa-folder-open"></i></button>
                                                 <button type="button" class="btn btn-xs btn-white btn-round imatic-el-ncpf-del" title="Odebrat">&times;</button>
                                             </div>
                                         <?php endforeach; ?>
                                     </div>
                                     <button type="button" class="btn btn-xs btn-white btn-round" id="imatic-el-ncpf-add">+ přidat mapování</button>
-                                    <span class="small">Vyber projekt a zadej jeho NC složku. Ten projekt pak v pickeru prochází jen tento podstrom; ostatní projekty použijí globální fallback.</span>
+                                    <span class="small">Vyber projekt a zvol jeho NC složku (tlačítko <i class="ace-icon fa fa-folder-open"></i> Procházet, nebo napiš cestu). Ten projekt pak v pickeru prochází jen tento podstrom; ostatní projekty použijí globální fallback.</span>
 
                                     <template id="imatic-el-ncpf-template">
                                         <div class="imatic-el-ncpf-row">
@@ -295,9 +296,24 @@ print_manage_menu('manage_plugin_page.php');
                                                 <?php print_project_option_list(0, false) ?>
                                             </select>
                                             <input type="text" name="nc_pf_path[]" class="imatic-el-ncpf-path form-control" placeholder="/Zakaznici" />
+                                            <button type="button" class="btn btn-xs btn-white btn-round imatic-el-ncpf-browse" title="Procházet Nextcloud"><i class="ace-icon fa fa-folder-open"></i></button>
                                             <button type="button" class="btn btn-xs btn-white btn-round imatic-el-ncpf-del" title="Odebrat">&times;</button>
                                         </div>
                                     </template>
+
+                                    <div id="imatic-el-ncbrowse" class="imatic-el-ncbrowse" hidden>
+                                        <div class="imatic-el-ncbrowse-box">
+                                            <div class="imatic-el-ncbrowse-bar">
+                                                <button type="button" class="btn btn-xs btn-white btn-round" id="imatic-el-ncbrowse-up"><i class="ace-icon fa fa-level-up"></i> Nahoru</button>
+                                                <span class="imatic-el-ncbrowse-path"></span>
+                                                <button type="button" class="btn btn-xs btn-white btn-round" id="imatic-el-ncbrowse-cancel">Zavřít</button>
+                                            </div>
+                                            <ul class="imatic-el-ncbrowse-list"></ul>
+                                            <div class="imatic-el-ncbrowse-actions">
+                                                <button type="button" class="btn btn-xs btn-primary btn-round" id="imatic-el-ncbrowse-pick">Vybrat tuto složku</button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                             <tr>
