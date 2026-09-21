@@ -21,7 +21,6 @@ $s_imatic_el_url_placeholder    = 'https://…';
 $s_imatic_el_description_label  = 'Popis (nepovinné)';
 
 $s_imatic_el_action_open        = 'Otevřít';
-$s_imatic_el_action_open_editor = 'Otevřít v editoru';
 $s_imatic_el_action_open_customer = 'Otevřít zákazníka';
 
 $s_imatic_el_add_customer_btn            = 'Připojit zákazníka';
@@ -64,8 +63,6 @@ $s_imatic_el_cfg_proxy                = 'Proxy allow-list';
 $s_imatic_el_cfg_proxy_help           = 'Jeden origin na řádek. Originy, které smí server načítat pro obohacení (ochrana SSRF). Prázdné = jen Nextcloud URL.';
 $s_imatic_el_cfg_auth                 = 'Nextcloud režim ověření';
 $s_imatic_el_cfg_auth_help            = 'Jak se server ověřuje vůči Nextcloudu pro obohacení / procházení.';
-$s_imatic_el_cfg_editor               = 'Online editor';
-$s_imatic_el_cfg_editor_help          = 'Editor použitý pro akci „otevřít v editoru" u office souborů.';
 $s_imatic_el_cfg_nc_account           = 'NC servisní účet';
 $s_imatic_el_cfg_nc_account_help      = 'Uživatel + app heslo servisního účtu pro Nextcloud picker (WebDAV). Použije se jen při režimu service_account. Prázdné heslo = ponechá uložené.';
 $s_imatic_el_cfg_pw_stored            = '•••••••• (uloženo — ponechte prázdné)';

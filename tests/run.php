@@ -500,7 +500,7 @@ eq(null, $gNoHttp->enrich(['url' => 'https://good.example.com/x']), 'enrich → 
 // ─── NextcloudProvider ───────────────────────────────────────────────────────
 
 group('NextcloudProvider');
-$ncp = new NextcloudProvider(['https://cloud.example.com'], null, 'collabora');
+$ncp = new NextcloudProvider(['https://cloud.example.com'], null);
 ok($ncp->matches('https://cloud.example.com/f/42'), 'matches configured origin');
 ok(!$ncp->matches('https://other.example.com/f/42'), 'does not match foreign origin');
 
@@ -522,20 +522,11 @@ try {
 }
 ok($threwNc, 'normalize rejects non-NC origin');
 
-ok(NextcloudProvider::isOfficeMime('application/vnd.openxmlformats-officedocument.wordprocessingml.document'), 'docx recognised as office');
-ok(!NextcloudProvider::isOfficeMime('image/png'), 'png not office');
-
-// actions: a single "open" action regardless of type (no separate editor link;
-// Nextcloud opens the file in its own editor when one is the default handler).
+// actions: a single "open" action; Nextcloud opens the file in its own editor
+// when the instance has one set as the default handler.
 $openOnly = $ncp->actions(['url' => 'https://cloud.example.com/f/42', 'meta' => ['fileid' => '42', 'mime' => 'image/png']]);
-eq(1, count($openOnly), 'non-office file gets open action only');
+eq(1, count($openOnly), 'NC file gets a single open action');
 eq('imatic_el_action_open', $openOnly[0]->label, 'the action is "open"');
-
-$officeActions = $ncp->actions([
-    'url'  => 'https://cloud.example.com/f/42',
-    'meta' => ['fileid' => '42', 'mime' => 'application/vnd.oasis.opendocument.text'],
-]);
-eq(1, count($officeActions), 'office file also gets the open action only (no editor link)');
 
 // enrich: gateway metadata sanitized into LinkMeta
 $gw = new StubNextcloudGateway(['name' => 'notes.odt', 'mime' => 'application/vnd.oasis.opendocument.text', 'size' => '55', 'junk' => 'x']);
@@ -720,7 +711,7 @@ ok($badThrew, 'add rejects non-http url via provider normalize');
 
 group('LinkService — add (nextcloud + enrichment)');
 $ncGw   = new StubNextcloudGateway(['name' => 'notes.odt', 'mime' => 'application/vnd.oasis.opendocument.text', 'size' => '55']);
-$ncProv = new NextcloudProvider(['https://cloud.example.com'], $ncGw, 'collabora');
+$ncProv = new NextcloudProvider(['https://cloud.example.com'], $ncGw);
 $ncRepo = new FakeLinkRepository();
 $ncSvc  = new LinkService($ncRepo, el_registry($ncProv), new FakeAccessGuard());
 $ncRow  = $ncSvc->add(200, 'https://cloud.example.com/f/42', null);
@@ -773,7 +764,7 @@ group('LinkService — refresh');
 // Store a NC link whose cached title is stale, then refresh from the gateway.
 $refRepo = new FakeLinkRepository();
 $refGw   = new StubNextcloudGateway(['name' => 'fresh.odt', 'mime' => 'application/vnd.oasis.opendocument.text']);
-$refProv = new NextcloudProvider(['https://cloud.example.com'], $refGw, 'collabora');
+$refProv = new NextcloudProvider(['https://cloud.example.com'], $refGw);
 $refRepo->insert([
     'bug_id' => 400, 'provider' => 'nextcloud', 'url' => 'https://cloud.example.com/f/9',
     'title' => 'stale.odt', 'description' => null, 'meta' => ['fileid' => '9'], 'created_by' => 7,

@@ -52,7 +52,6 @@ if (!function_exists('imatic_el_container')) {
         $t_view_threshold   = (int) plugin_config_get(ImaticExternalLinksPlugin::CFG_VIEW);
         $t_manage_threshold = (int) plugin_config_get(ImaticExternalLinksPlugin::CFG_MANAGE);
         $t_base_urls        = (array) plugin_config_get(ImaticExternalLinksPlugin::CFG_NC_BASE_URLS);
-        $t_editor           = (string) plugin_config_get(ImaticExternalLinksPlugin::CFG_NC_EDITOR);
         $t_proxy_allow      = (array) plugin_config_get(ImaticExternalLinksPlugin::CFG_PROXY_ALLOW);
         $t_customers_pid    = (int) plugin_config_get(ImaticExternalLinksPlugin::CFG_CUSTOMERS_PROJECT);
         $t_customer_fields  = (array) plugin_config_get(ImaticExternalLinksPlugin::CFG_CUSTOMER_FIELDS);
@@ -123,7 +122,7 @@ if (!function_exists('imatic_el_container')) {
         // Order matters: specific providers first, generic catch-all last.
         $t_registry = new ProviderRegistry([
             $t_customer,
-            new NextcloudProvider($t_base_urls, null, $t_editor),
+            new NextcloudProvider($t_base_urls, null),
             new GenericUrlProvider($t_http, $t_allow_list),
         ]);
 

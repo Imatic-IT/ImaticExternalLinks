@@ -28,24 +28,8 @@ final class NextcloudProvider implements LinkProvider
     /** @var NextcloudGateway|null */
     private $gateway;
 
-    /** @var string 'collabora'|'onlyoffice' */
-    private $editor;
-
     /** @var MetaValidator */
     private $validator;
-
-    /** @var string[] */
-    private static $officeMimes = [
-        'application/vnd.oasis.opendocument.text',
-        'application/vnd.oasis.opendocument.spreadsheet',
-        'application/vnd.oasis.opendocument.presentation',
-        'application/msword',
-        'application/vnd.ms-excel',
-        'application/vnd.ms-powerpoint',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-    ];
 
     /**
      * @param string[]              $baseUrls  configured Nextcloud base URLs
@@ -54,7 +38,6 @@ final class NextcloudProvider implements LinkProvider
     public function __construct(
         array $baseUrls,
         ?NextcloudGateway $gateway = null,
-        string $editor = 'collabora',
         ?MetaValidator $validator = null
     ) {
         $map = [];
@@ -66,7 +49,6 @@ final class NextcloudProvider implements LinkProvider
         }
         $this->origins   = $map;
         $this->gateway   = $gateway;
-        $this->editor    = $editor === 'onlyoffice' ? 'onlyoffice' : 'collabora';
         $this->validator = $validator ?: new MetaValidator();
     }
 
@@ -162,10 +144,5 @@ final class NextcloudProvider implements LinkProvider
         } catch (\Throwable $e) {
             return null;
         }
-    }
-
-    public static function isOfficeMime(string $mime): bool
-    {
-        return in_array(strtolower($mime), self::$officeMimes, true);
     }
 }

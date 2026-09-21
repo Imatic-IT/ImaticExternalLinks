@@ -21,7 +21,6 @@ $s_imatic_el_url_placeholder    = 'https://…';
 $s_imatic_el_description_label  = 'Description (optional)';
 
 $s_imatic_el_action_open        = 'Open';
-$s_imatic_el_action_open_editor = 'Open in editor';
 $s_imatic_el_action_open_customer = 'Open customer';
 
 $s_imatic_el_add_customer_btn            = 'Attach customer';
@@ -64,8 +63,6 @@ $s_imatic_el_cfg_proxy                = 'Proxy allow-list';
 $s_imatic_el_cfg_proxy_help           = 'One origin per line. Origins the server may fetch for enrichment (SSRF guard). Empty = Nextcloud URLs only.';
 $s_imatic_el_cfg_auth                 = 'Nextcloud auth mode';
 $s_imatic_el_cfg_auth_help            = 'How the server authenticates to Nextcloud for enrichment / browsing.';
-$s_imatic_el_cfg_editor               = 'Online editor';
-$s_imatic_el_cfg_editor_help          = 'Editor used for the "open in editor" action on office files.';
 $s_imatic_el_cfg_nc_account           = 'NC service account';
 $s_imatic_el_cfg_nc_account_help      = 'Service-account user + app password for the Nextcloud file picker (WebDAV). Used only when auth mode = service_account. Leave the password blank to keep the stored one.';
 $s_imatic_el_cfg_pw_stored            = '•••••••• (stored — leave blank to keep)';

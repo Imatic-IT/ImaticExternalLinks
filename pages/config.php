@@ -80,12 +80,6 @@ if (gpc_get_bool('save', false)) {
         in_array($t_auth_mode, ['off', 'per_user', 'service_account'], true) ? $t_auth_mode : 'off'
     );
 
-    $t_editor = gpc_get_string('nc_online_editor', 'collabora');
-    plugin_config_set(
-        ImaticExternalLinksPlugin::CFG_NC_EDITOR,
-        in_array($t_editor, ['collabora', 'onlyoffice'], true) ? $t_editor : 'collabora'
-    );
-
     // Customer relation: project holding customer records (0 = disabled) and the
     // meta-key => Mantis custom-field name map used for invoicing enrichment.
     plugin_config_set(ImaticExternalLinksPlugin::CFG_CUSTOMERS_PROJECT, gpc_get_int('customers_project_id', 0));
@@ -137,7 +131,6 @@ $t_manage      = plugin_config_get(ImaticExternalLinksPlugin::CFG_MANAGE);
 $t_base_urls   = (array) plugin_config_get(ImaticExternalLinksPlugin::CFG_NC_BASE_URLS);
 $t_proxy_allow = (array) plugin_config_get(ImaticExternalLinksPlugin::CFG_PROXY_ALLOW);
 $t_auth_mode   = plugin_config_get(ImaticExternalLinksPlugin::CFG_NC_AUTH_MODE);
-$t_editor      = plugin_config_get(ImaticExternalLinksPlugin::CFG_NC_EDITOR);
 $t_customers_pid    = (int) plugin_config_get(ImaticExternalLinksPlugin::CFG_CUSTOMERS_PROJECT);
 $t_customer_fields  = (array) plugin_config_get(ImaticExternalLinksPlugin::CFG_CUSTOMER_FIELDS);
 $t_customer_enabled = array_map('intval', (array) plugin_config_get(ImaticExternalLinksPlugin::CFG_CUSTOMER_ENABLED_PROJECTS));
@@ -237,17 +230,6 @@ print_manage_menu('manage_plugin_page.php');
                                         <?php endforeach; ?>
                                     </select>
                                     <span class="small"><?php echo string_display_line(lang_get('imatic_el_cfg_auth_help')) ?></span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="category"><?php echo string_display_line(lang_get('imatic_el_cfg_editor')) ?></th>
-                                <td>
-                                    <select name="nc_online_editor">
-                                        <?php foreach (['collabora', 'onlyoffice'] as $t_ed): ?>
-                                            <option value="<?php echo $t_ed ?>" <?php echo $t_editor === $t_ed ? 'selected' : '' ?>><?php echo $t_ed ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                    <span class="small"><?php echo string_display_line(lang_get('imatic_el_cfg_editor_help')) ?></span>
                                 </td>
                             </tr>
                             <tr>

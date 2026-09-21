@@ -25,7 +25,6 @@ class ImaticExternalLinksPlugin extends MantisPlugin
     public const CFG_NC_BASE_URLS     = 'nextcloud_base_urls';
     public const CFG_PROXY_ALLOW      = 'proxy_allow_list';
     public const CFG_NC_AUTH_MODE     = 'nc_auth_mode';
-    public const CFG_NC_EDITOR        = 'nc_online_editor';
     /** Nextcloud service-account credentials for the file picker (WebDAV). */
     public const CFG_NC_SERVICE_USER     = 'nc_service_user';
     public const CFG_NC_SERVICE_PASSWORD = 'nc_service_password';
@@ -70,7 +69,6 @@ class ImaticExternalLinksPlugin extends MantisPlugin
             self::CFG_NC_BASE_URLS     => [],
             self::CFG_PROXY_ALLOW      => [],
             self::CFG_NC_AUTH_MODE     => 'off',
-            self::CFG_NC_EDITOR        => 'collabora',
             self::CFG_NC_SERVICE_USER     => '',
             self::CFG_NC_SERVICE_PASSWORD => '',
             self::CFG_NC_PROJECT_FOLDERS  => [],
@@ -266,7 +264,6 @@ class ImaticExternalLinksPlugin extends MantisPlugin
             'imatic_el_url_placeholder',
             'imatic_el_description_label',
             'imatic_el_action_open',
-            'imatic_el_action_open_editor',
             'imatic_el_action_open_customer',
             'imatic_el_add_customer_btn',
             'imatic_el_nc_add_btn',
