@@ -127,21 +127,16 @@ final class NextcloudProvider implements LinkProvider
 
     public function actions(array $row): array
     {
-        $url     = isset($row['url']) ? (string) $row['url'] : '';
-        $actions = [new LinkAction('imatic_el_action_open', $url, 'nextcloud', true)];
+        $url = isset($row['url']) ? (string) $row['url'] : '';
 
-        $meta   = (isset($row['meta']) && is_array($row['meta'])) ? $row['meta'] : [];
-        $fileId = isset($meta['fileid']) ? (string) $meta['fileid'] : '';
-        $mime   = isset($meta['mime']) ? (string) $meta['mime'] : '';
-
-        if ($fileId !== '' && $mime !== '' && self::isOfficeMime($mime)) {
-            $origin = UrlNormalizer::origin($url);
-            if ($origin !== null) {
-                $editorUrl = $origin . '/index.php/f/' . rawurlencode($fileId) . '?openfile=true';
-                $actions[] = new LinkAction('imatic_el_action_open_editor', $editorUrl, 'editor', true);
-            }
-        }
-        return $actions;
+        // A single "open" action: the file opens in Nextcloud, which uses the
+        // online editor itself when the instance has Collabora/OnlyOffice set as
+        // the default handler for the type. We deliberately do NOT emit a
+        // separate "open in editor" link — there is no reliable cross-instance
+        // URL that forces an editor, and instances without one just bounce to
+        // the Files app (confusing). The `open` URL equals the row's title link,
+        // so the UI renders it as the clickable file name (no extra button).
+        return [new LinkAction('imatic_el_action_open', $url, 'nextcloud', true)];
     }
 
     public function enrich(array $row): ?LinkMeta

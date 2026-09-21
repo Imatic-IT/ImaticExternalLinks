@@ -525,17 +525,17 @@ ok($threwNc, 'normalize rejects non-NC origin');
 ok(NextcloudProvider::isOfficeMime('application/vnd.openxmlformats-officedocument.wordprocessingml.document'), 'docx recognised as office');
 ok(!NextcloudProvider::isOfficeMime('image/png'), 'png not office');
 
-// actions: editor action only for office files with a fileid
+// actions: a single "open" action regardless of type (no separate editor link;
+// Nextcloud opens the file in its own editor when one is the default handler).
 $openOnly = $ncp->actions(['url' => 'https://cloud.example.com/f/42', 'meta' => ['fileid' => '42', 'mime' => 'image/png']]);
 eq(1, count($openOnly), 'non-office file gets open action only');
+eq('imatic_el_action_open', $openOnly[0]->label, 'the action is "open"');
 
-$withEditor = $ncp->actions([
+$officeActions = $ncp->actions([
     'url'  => 'https://cloud.example.com/f/42',
     'meta' => ['fileid' => '42', 'mime' => 'application/vnd.oasis.opendocument.text'],
 ]);
-eq(2, count($withEditor), 'office file gets open + editor actions');
-eq('imatic_el_action_open_editor', $withEditor[1]->label, 'second action is editor');
-eq('https://cloud.example.com/index.php/f/42?openfile=true', $withEditor[1]->url, 'editor url built from origin + fileid (via index.php)');
+eq(1, count($officeActions), 'office file also gets the open action only (no editor link)');
 
 // enrich: gateway metadata sanitized into LinkMeta
 $gw = new StubNextcloudGateway(['name' => 'notes.odt', 'mime' => 'application/vnd.oasis.opendocument.text', 'size' => '55', 'junk' => 'x']);
@@ -728,7 +728,7 @@ eq('nextcloud', $ncRow['provider'], 'add: NC url resolves to nextcloud');
 eq('notes.odt', $ncRow['title'], 'add: title from enrichment');
 eq('42', $ncRow['meta']['fileid'], 'add: enrichment preserves fileid');
 eq('nextcloud', $ncRow['meta']['icon'], 'add: enrichment icon merged into meta');
-eq(2, count($ncRow['actions']), 'add: office NC file has open + editor actions');
+eq(1, count($ncRow['actions']), 'add: NC file has a single open action');
 
 group('LinkService — list');
 $listSvc = new LinkService($ncRepo, el_registry($ncProv), new FakeAccessGuard());
