@@ -102,6 +102,17 @@ if (gpc_get_bool('save', false)) {
         imatic_el_sanitize_pids(gpc_get_int_array('links_enabled_projects', []))
     );
 
+    // Nextcloud file picker: service-account credentials + folder scoping. A
+    // blank password field keeps the stored one (so the secret is never echoed
+    // into the page and re-saving other settings doesn't wipe it).
+    plugin_config_set(ImaticExternalLinksPlugin::CFG_NC_SERVICE_USER, gpc_get_string('nc_service_user', ''));
+    $t_nc_password = gpc_get_string('nc_service_password', '');
+    if ($t_nc_password !== '') {
+        plugin_config_set(ImaticExternalLinksPlugin::CFG_NC_SERVICE_PASSWORD, $t_nc_password);
+    }
+    plugin_config_set(ImaticExternalLinksPlugin::CFG_NC_GLOBAL_FOLDERS, imatic_el_parse_lines(gpc_get_string('nc_global_folders', '')));
+    plugin_config_set(ImaticExternalLinksPlugin::CFG_NC_PROJECT_FOLDERS, imatic_el_parse_map(gpc_get_string('nc_project_folders', '')));
+
     form_security_purge('plugin_imatic_external_links_config');
     print_successful_redirect(plugin_page('config', true));
 }
@@ -122,6 +133,17 @@ $t_links_enabled    = array_map('intval', (array) plugin_config_get(ImaticExtern
 $t_fields_text = '';
 foreach ($t_customer_fields as $t_k => $t_v) {
     $t_fields_text .= $t_k . ' = ' . $t_v . "\n";
+}
+
+// Nextcloud picker seeds. The password is never echoed back; we only signal
+// whether one is already stored.
+$t_nc_service_user    = (string) plugin_config_get(ImaticExternalLinksPlugin::CFG_NC_SERVICE_USER);
+$t_nc_has_password    = (string) plugin_config_get(ImaticExternalLinksPlugin::CFG_NC_SERVICE_PASSWORD) !== '';
+$t_nc_global_folders  = (array) plugin_config_get(ImaticExternalLinksPlugin::CFG_NC_GLOBAL_FOLDERS);
+$t_nc_project_folders = (array) plugin_config_get(ImaticExternalLinksPlugin::CFG_NC_PROJECT_FOLDERS);
+$t_nc_project_text    = '';
+foreach ($t_nc_project_folders as $t_pid => $t_folder) {
+    $t_nc_project_text .= $t_pid . ' = ' . $t_folder . "\n";
 }
 
 $t_access_levels = MantisEnum::getAssocArrayIndexedByValues(config_get('access_levels_enum_string'));
@@ -212,6 +234,31 @@ print_manage_menu('manage_plugin_page.php');
                                         <?php endforeach; ?>
                                     </select>
                                     <span class="small">Editor used for the "open in editor" action on office files.</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="category">NC service account</th>
+                                <td>
+                                    <input type="text" name="nc_service_user" class="form-control" autocomplete="off"
+                                           value="<?php echo htmlspecialchars($t_nc_service_user, ENT_QUOTES, 'UTF-8') ?>"
+                                           placeholder="mantis" />
+                                    <input type="password" name="nc_service_password" class="form-control" autocomplete="new-password"
+                                           placeholder="<?php echo $t_nc_has_password ? '•••••••• (uloženo — ponechte prázdné)' : 'app password' ?>" />
+                                    <span class="small">Service-account user + app password for the Nextcloud file picker (WebDAV). Used only when auth mode = <code>service_account</code>. Leave the password blank to keep the stored one.</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="category">NC folders — global</th>
+                                <td>
+                                    <textarea name="nc_global_folders" rows="3" class="form-control" placeholder="/Sdilene"><?php echo htmlspecialchars(implode("\n", $t_nc_global_folders), ENT_QUOTES, 'UTF-8') ?></textarea>
+                                    <span class="small">One folder path per line. Fallback scope for projects without their own mapping. Empty = picker off there.</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="category">NC folders — per project</th>
+                                <td>
+                                    <textarea name="nc_project_folders" rows="4" class="form-control" placeholder="406 = /Zakaznici"><?php echo htmlspecialchars(rtrim($t_nc_project_text), ENT_QUOTES, 'UTF-8') ?></textarea>
+                                    <span class="small">One "<code>projectId = /folder</code>" per line. That project's picker browses only this subtree; others use the global fallback.</span>
                                 </td>
                             </tr>
                             <tr>

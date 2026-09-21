@@ -48,6 +48,10 @@ export const RuntimeConfigSchema = z.object({
   backlinks: z.array(BacklinkSchema).default([]),
   /** Status enum for the core relationships filter (label + closed flag). */
   relStatuses: z.array(RelStatusSchema).default([]),
+  /** Whether the Nextcloud file picker is offered on this project. */
+  nextcloudPickerEnabled: z.boolean().default(false),
+  /** Endpoint for the Nextcloud picker (browse + attach). */
+  nextcloudBrowseUrl: z.string().default(''),
 });
 export type RuntimeConfig = z.infer<typeof RuntimeConfigSchema>;
 

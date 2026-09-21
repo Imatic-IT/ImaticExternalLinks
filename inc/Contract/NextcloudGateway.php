@@ -20,9 +20,18 @@ interface NextcloudGateway
     public function stat(string $fileId): ?array;
 
     /**
+     * File/folder metadata by Nextcloud path (server-relative to the user's
+     * files root, e.g. "/Zakaznici/2024/a.pdf"), or null when it cannot be
+     * resolved. Used at attach time to capture authoritative name/mime/fileid.
+     *
+     * @return array<string,mixed>|null e.g. ['fileid'=>..,'name'=>..,'mime'=>..,'size'=>..,'isDir'=>bool]
+     */
+    public function statPath(string $path): ?array;
+
+    /**
      * Folder listing for the picker.
      *
-     * @return array<int,array<string,mixed>> entries (name/path/mime/size/...)
+     * @return array<int,array<string,mixed>> entries (name/path/mime/size/isDir/fileid)
      */
     public function browse(string $path): array;
 }

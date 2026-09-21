@@ -9,6 +9,7 @@ export interface UseLinks {
   error: string | null;
   clearError: () => void;
   add: (url: string, description: string) => Promise<boolean>;
+  attachNextcloud: (path: string) => Promise<boolean>;
   remove: (id: number) => Promise<boolean>;
   refresh: (id: number) => Promise<boolean>;
   reload: () => Promise<boolean>;
@@ -47,6 +48,11 @@ export function useLinks(api: LinksApi, initial: LinkRow[], t: (key: string) => 
     add: (url, description) =>
       run(async () => {
         const row = await api.add(url, description);
+        setLinks((prev) => [...prev, row]);
+      }),
+    attachNextcloud: (path) =>
+      run(async () => {
+        const row = await api.attachNextcloud(path);
         setLinks((prev) => [...prev, row]);
       }),
     remove: (id) =>

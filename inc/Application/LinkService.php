@@ -105,6 +105,58 @@ final class LinkService
     }
 
     /**
+     * Attach a link whose display metadata is already known authoritatively by
+     * the caller (e.g. the Nextcloud picker, which captured name/mime/fileid via
+     * a server-side PROPFIND). Same rules as {@see add()} — manage access, URL
+     * length, no duplicate — but enrichment is skipped: the supplied title/meta
+     * are trusted and merged over whatever the provider derives from the URL.
+     *
+     * @param array<string,mixed> $meta
+     * @return array<string,mixed> the decorated row
+     */
+    public function addResolved(int $bugId, string $rawUrl, ?string $title, array $meta, ?string $description): array
+    {
+        $this->access->ensureCanManage($bugId);
+
+        $t_provider   = $this->registry->forUrl($rawUrl);
+        $t_normalized = $t_provider->normalize($rawUrl);
+
+        if (strlen($t_normalized->url) > self::MAX_URL) {
+            throw new InvalidLinkException('URL exceeds the maximum length');
+        }
+        foreach ($this->store->findByBug($bugId) as $t_existing) {
+            if ((string) ($t_existing['url'] ?? '') === $t_normalized->url) {
+                throw new DuplicateLinkException('This link is already attached to the issue');
+            }
+        }
+
+        // Caller-supplied metadata wins over the provider's URL-derived guesses.
+        $t_meta        = array_merge($t_normalized->meta, $meta);
+        $t_title       = ($title !== null && $title !== '') ? $title : $t_normalized->title;
+        $t_description = $this->cleanDescription($description);
+
+        $t_id = $this->store->insert([
+            'bug_id'      => $bugId,
+            'provider'    => $t_provider->key(),
+            'url'         => $t_normalized->url,
+            'title'       => $t_title,
+            'description' => $t_description,
+            'meta'        => $t_meta,
+            'created_by'  => $this->access->currentUserId(),
+        ]);
+
+        return $this->decorate([
+            'id'          => $t_id,
+            'bug_id'      => $bugId,
+            'provider'    => $t_provider->key(),
+            'url'         => $t_normalized->url,
+            'title'       => $t_title,
+            'description' => $t_description,
+            'meta'        => $t_meta,
+        ], $t_provider);
+    }
+
+    /**
      * @throws \ImaticExternalLinks\Application\Exception\AccessDeniedException
      * @throws NotFoundException
      */

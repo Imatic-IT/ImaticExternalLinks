@@ -30,6 +30,8 @@ require $root . '/inc/Domain/LinkProvider.php';
 require $root . '/inc/Domain/ProviderRegistry.php';
 require $root . '/inc/Domain/RelationDefinition.php';
 require $root . '/inc/Domain/RelationConfig.php';
+require $root . '/inc/Domain/NextcloudScope.php';
+require $root . '/inc/Domain/NextcloudScopeConfig.php';
 require $root . '/inc/Domain/Provider/GenericUrlProvider.php';
 require $root . '/inc/Domain/Provider/NextcloudProvider.php';
 require $root . '/inc/Domain/Provider/CustomerProvider.php';
@@ -39,6 +41,7 @@ require $root . '/inc/Application/Exception/AccessDeniedException.php';
 require $root . '/inc/Application/Exception/NotFoundException.php';
 require $root . '/inc/Application/LinkService.php';
 require $root . '/inc/Application/CustomerPickerService.php';
+require $root . '/inc/Application/NextcloudPickerService.php';
 
 use ImaticExternalLinks\Application\CustomerPickerService;
 use ImaticExternalLinks\Application\Exception\AccessDeniedException;
@@ -135,9 +138,56 @@ final class StubNextcloudGateway implements NextcloudGateway
         return $this->stat;
     }
 
+    public function statPath(string $path): ?array
+    {
+        return $this->stat;
+    }
+
     public function browse(string $path): array
     {
         return [];
+    }
+}
+
+/**
+ * In-memory Nextcloud gateway for the picker tests. Backed by a flat map of
+ * path => entry (each entry carries fileid/name/isDir/mime/size); browse()
+ * returns the direct children of a folder path.
+ */
+final class FakeNextcloudGateway implements NextcloudGateway
+{
+    /** @var array<string,array<string,mixed>> path => entry */
+    private $tree;
+
+    /** @param array<string,array<string,mixed>> $tree */
+    public function __construct(array $tree)
+    {
+        $this->tree = $tree;
+    }
+
+    public function stat(string $fileId): ?array
+    {
+        return null;
+    }
+
+    public function statPath(string $path): ?array
+    {
+        return $this->tree[$path] ?? null;
+    }
+
+    public function browse(string $path): array
+    {
+        $t_prefix = $path === '/' ? '/' : $path . '/';
+        $t_out = [];
+        foreach ($this->tree as $t_path => $t_entry) {
+            if ($t_path === $path) {
+                continue;
+            }
+            if (strpos($t_path, $t_prefix) === 0 && strpos(substr($t_path, strlen($t_prefix)), '/') === false) {
+                $t_out[] = $t_entry;
+            }
+        }
+        return $t_out;
     }
 }
 
@@ -875,6 +925,125 @@ eq('spaced', $relMixed[0]->key(), 'key is trimmed');
 eq('mantis_issue', $relMixed[0]->provider(), 'missing provider defaults to mantis_issue');
 eq('spaced', $relMixed[0]->label(), 'missing label defaults to the key');
 eq(0, $relMixed[0]->primaryTargetProject(), 'no target projects → primary target 0');
+
+// ─── Nextcloud scope (path safety + per-project mapping) ──────────────────────
+
+use ImaticExternalLinks\Domain\NextcloudScope;
+use ImaticExternalLinks\Domain\NextcloudScopeConfig;
+
+// Path normalisation.
+eq('/', NextcloudScope::normalize(''), 'empty path → root');
+eq('/', NextcloudScope::normalize('/'), 'slash → root');
+eq('/Zakaznici', NextcloudScope::normalize('Zakaznici'), 'leading slash forced');
+eq('/Zakaznici/2024', NextcloudScope::normalize('/Zakaznici//2024/'), 'dup + trailing slashes collapsed');
+eq('/a/b', NextcloudScope::normalize('/a/./b'), '"." segment dropped');
+eq('/a', NextcloudScope::normalize('/a/b/..'), '".." applied within path');
+eq(null, NextcloudScope::normalize('/a/../..'), '".." above root → null');
+eq(null, NextcloudScope::normalize('../etc'), 'leading ".." → null');
+
+// Scope containment + resolve.
+$scope = new NextcloudScope(['/Zakaznici', '/Faktury/']);
+ok($scope->isEnabled(), 'scope with roots is enabled');
+ok($scope->contains('/Zakaznici'), 'root itself is in scope');
+ok($scope->contains('/Zakaznici/2024/a.pdf'), 'path under root is in scope');
+ok(!$scope->contains('/Zakaznicii'), 'sibling prefix is NOT in scope');
+ok(!$scope->contains('/Other'), 'unmapped path not in scope');
+eq('/Faktury/2024', $scope->resolve('/Faktury/2024'), 'in-scope path resolves');
+eq(null, $scope->resolve('/Faktury/../etc'), 'traversal out of root refused');
+eq(null, $scope->resolve('/Other'), 'out-of-scope path refused');
+eq(null, $scope->resolve(''), 'empty request with several roots → null (caller lists roots)');
+eq('/Only', (new NextcloudScope(['/Only']))->resolve(''), 'empty request with single root → that root');
+
+$empty = new NextcloudScope([]);
+ok(!$empty->isEnabled(), 'no roots → disabled');
+eq(null, $empty->resolve('/anything'), 'disabled scope resolves nothing');
+
+// Per-project mapping with global fallback.
+$projectFolders = [406 => '/Zakaznici', '12' => ['/A', '/B']];
+$globalFolders  = ['/Shared'];
+eq(['/Zakaznici'], NextcloudScopeConfig::forProject($projectFolders, $globalFolders, 406)->roots(), 'project mapping (string) used');
+eq(['/A', '/B'], NextcloudScopeConfig::forProject($projectFolders, $globalFolders, 12)->roots(), 'project mapping (numeric-string key + list) used');
+eq(['/Shared'], NextcloudScopeConfig::forProject($projectFolders, $globalFolders, 99)->roots(), 'unmapped project → global fallback');
+ok(!NextcloudScopeConfig::forProject([], [], 5)->isEnabled(), 'no mapping + no global → disabled');
+
+// ─── Nextcloud picker service (browse + attach, scope-enforced) ───────────────
+
+use ImaticExternalLinks\Application\NextcloudPickerService;
+
+$ncBase   = 'https://cloud.example.com';
+$ncTree   = [
+    '/Zakaznici'          => ['fileid' => '1', 'name' => 'Zakaznici', 'path' => '/Zakaznici', 'isDir' => true, 'mime' => '', 'size' => 0],
+    '/Zakaznici/2024'     => ['fileid' => '10', 'name' => '2024', 'path' => '/Zakaznici/2024', 'isDir' => true, 'mime' => '', 'size' => 0],
+    '/Zakaznici/a.pdf'    => ['fileid' => '42', 'name' => 'a.pdf', 'path' => '/Zakaznici/a.pdf', 'isDir' => false, 'mime' => 'application/pdf', 'size' => 100],
+];
+$ncPickAccess = new FakeAccessGuard(true, true, 7);
+$ncPickRepo   = new FakeLinkRepository();
+$ncPickLinks  = new LinkService($ncPickRepo, el_registry(new NextcloudProvider([$ncBase])), $ncPickAccess);
+$ncPicker     = new NextcloudPickerService(
+    $ncPickAccess,
+    $ncPickLinks,
+    new FakeNextcloudGateway($ncTree),
+    new NextcloudScope(['/Zakaznici']),
+    $ncBase
+);
+
+ok($ncPicker->isEnabled(), 'picker enabled with gateway + scope');
+
+$brw = $ncPicker->browse(1, '/Zakaznici');
+eq('/Zakaznici', $brw['path'], 'browse resolves in-scope path');
+eq(2, count($brw['entries']), 'browse lists direct children only');
+
+$brwRoot = $ncPicker->browse(1, '');   // single root → opens it
+eq('/Zakaznici', $brwRoot['path'], 'empty request with single root opens that root');
+
+$brwDenied = false;
+try {
+    $ncPicker->browse(1, '/Other');
+} catch (AccessDeniedException $e) {
+    $brwDenied = true;
+}
+ok($brwDenied, 'browse refuses out-of-scope path');
+
+$attached = $ncPicker->attach(1, '/Zakaznici/a.pdf');
+eq($ncBase . '/f/42', $attached['url'], 'attach builds /f/<id> link');
+eq('a.pdf', $attached['title'], 'attach stores file name as title');
+eq('nextcloud', $attached['provider'], 'attach resolves the Nextcloud provider');
+eq('application/pdf', $attached['meta']['mime'] ?? '', 'attach persists mime in meta');
+eq(1, count($ncPickRepo->findByBug(1)), 'attach inserts exactly one link');
+
+$attDir = false;
+try {
+    $ncPicker->attach(1, '/Zakaznici/2024');
+} catch (NotFoundException $e) {
+    $attDir = true;
+}
+ok($attDir, 'attach refuses a folder');
+
+$attDenied = false;
+try {
+    $ncPicker->attach(1, '/Other/secret.pdf');
+} catch (AccessDeniedException $e) {
+    $attDenied = true;
+}
+ok($attDenied, 'attach refuses out-of-scope path');
+
+// Disabled picker: no gateway → offered off, browse empty, attach refused.
+$ncOff = new NextcloudPickerService(
+    new FakeAccessGuard(true, true, 7),
+    new LinkService(new FakeLinkRepository(), el_registry(), new FakeAccessGuard(true, true, 7)),
+    null,
+    new NextcloudScope(['/Zakaznici']),
+    $ncBase
+);
+ok(!$ncOff->isEnabled(), 'picker disabled without a gateway');
+eq(0, count($ncOff->browse(1, '/Zakaznici')['entries']), 'disabled picker browses nothing');
+$offAtt = false;
+try {
+    $ncOff->attach(1, '/Zakaznici/a.pdf');
+} catch (NotFoundException $e) {
+    $offAtt = true;
+}
+ok($offAtt, 'disabled picker refuses attach');
 
 // ─── summary ─────────────────────────────────────────────────────────────────
 

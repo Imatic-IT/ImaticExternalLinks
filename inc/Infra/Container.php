@@ -6,6 +6,7 @@ namespace ImaticExternalLinks\Infra;
 
 use ImaticExternalLinks\Application\CustomerPickerService;
 use ImaticExternalLinks\Application\LinkService;
+use ImaticExternalLinks\Application\NextcloudPickerService;
 use ImaticExternalLinks\Contract\AccessGuard;
 
 /**
@@ -24,6 +25,9 @@ final class Container
     /** @var CustomerPickerService */
     public $customerPicker;
 
+    /** @var NextcloudPickerService */
+    public $nextcloudPicker;
+
     /** @var JsonResponder */
     public $responder;
 
@@ -34,13 +38,15 @@ final class Container
         AccessGuard $access,
         LinkService $service,
         CustomerPickerService $customerPicker,
+        NextcloudPickerService $nextcloudPicker,
         JsonResponder $responder,
         bool $linksEnabled = true
     ) {
-        $this->access         = $access;
-        $this->service        = $service;
-        $this->customerPicker = $customerPicker;
-        $this->responder      = $responder;
-        $this->linksEnabled   = $linksEnabled;
+        $this->access          = $access;
+        $this->service         = $service;
+        $this->customerPicker  = $customerPicker;
+        $this->nextcloudPicker = $nextcloudPicker;
+        $this->responder       = $responder;
+        $this->linksEnabled    = $linksEnabled;
     }
 }

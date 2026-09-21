@@ -10,6 +10,7 @@ import { useLinks } from '../state/useLinks';
 import { AddLinkDialog } from './AddLinkDialog';
 import { CustomerPickerDialog } from './CustomerPickerDialog';
 import { LinkRow } from './LinkRow';
+import { NextcloudPickerDialog } from './NextcloudPickerDialog';
 
 interface Props {
   api: LinksApi;
@@ -32,6 +33,7 @@ export function LinksSection({ api, config, initial }: Props) {
   const links = useLinks(api, initial, t);
   const [adding, setAdding] = useState(false);
   const [pickingCustomer, setPickingCustomer] = useState(false);
+  const [pickingNc, setPickingNc] = useState(false);
   const [filter, setFilter] = useState<'all' | 'customer' | 'link'>('all');
   // Reverse references (issues linking to this customer). Only present on a
   // customer issue; when there are none the tab bar stays hidden.
@@ -74,6 +76,14 @@ export function LinksSection({ api, config, initial }: Props) {
     const ok = await links.add(`customer://${customerId}`, '');
     if (ok) {
       setPickingCustomer(false);
+    }
+  }
+
+  async function handlePickNc(path: string): Promise<void> {
+    // The server attaches the file (authoritative name/mime) and returns the row.
+    const ok = await links.attachNextcloud(path);
+    if (ok) {
+      setPickingNc(false);
     }
   }
 
@@ -138,6 +148,16 @@ export function LinksSection({ api, config, initial }: Props) {
               <i className="fa fa-building-o" aria-hidden="true" /> {t('imatic_el_add_customer_btn')}
             </button>
           )}
+          {config.canManage && config.nextcloudPickerEnabled && (
+            <button
+              type="button"
+              className="btn btn-xs btn-white btn-round"
+              disabled={links.busy || pickingNc}
+              onClick={() => setPickingNc(true)}
+            >
+              <i className="fa fa-cloud" aria-hidden="true" /> {t('imatic_el_nc_add_btn')}
+            </button>
+          )}
           {showFilter && (
             <select
               className="input-sm imatic-el-filter"
@@ -165,6 +185,16 @@ export function LinksSection({ api, config, initial }: Props) {
           excludeIds={attachedCustomerIds}
           onPick={(id) => void handlePickCustomer(id)}
           onCancel={() => setPickingCustomer(false)}
+        />
+      )}
+
+      {pickingNc && (
+        <NextcloudPickerDialog
+          t={t}
+          api={api}
+          busy={links.busy}
+          onPick={(p) => void handlePickNc(p)}
+          onCancel={() => setPickingNc(false)}
         />
       )}
 

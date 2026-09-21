@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 use ImaticExternalLinks\Application\CustomerPickerService;
 use ImaticExternalLinks\Application\LinkService;
+use ImaticExternalLinks\Application\NextcloudPickerService;
+use ImaticExternalLinks\Domain\NextcloudScopeConfig;
 use ImaticExternalLinks\Domain\OriginAllowList;
 use ImaticExternalLinks\Domain\Provider\CustomerProvider;
 use ImaticExternalLinks\Domain\Provider\GenericUrlProvider;
@@ -25,6 +27,7 @@ use ImaticExternalLinks\Infra\JsonResponder;
 use ImaticExternalLinks\Infra\LinkStore;
 use ImaticExternalLinks\Infra\MantisAccessGuard;
 use ImaticExternalLinks\Infra\MantisCustomerGateway;
+use ImaticExternalLinks\Infra\WebDavNextcloudGateway;
 
 require_once __DIR__ . '/autoload.php';
 
@@ -132,6 +135,24 @@ if (!function_exists('imatic_el_container')) {
         // here → empty search results + hidden button, never an error).
         $t_customer_picker = new CustomerPickerService($t_access, $t_picker_gw);
 
+        // Nextcloud file picker (ticket 86345). Server-side WebDAV via a single
+        // service account, visibility constrained per project by NextcloudScope.
+        // Wired only in service_account mode with credentials + a base URL; the
+        // picker instance is the first configured NC base URL.
+        $t_nc_auth_mode   = (string) plugin_config_get(ImaticExternalLinksPlugin::CFG_NC_AUTH_MODE);
+        $t_nc_svc_user    = (string) plugin_config_get(ImaticExternalLinksPlugin::CFG_NC_SERVICE_USER);
+        $t_nc_svc_pass    = (string) plugin_config_get(ImaticExternalLinksPlugin::CFG_NC_SERVICE_PASSWORD);
+        $t_nc_proj_folders = (array) plugin_config_get(ImaticExternalLinksPlugin::CFG_NC_PROJECT_FOLDERS);
+        $t_nc_glob_folders = (array) plugin_config_get(ImaticExternalLinksPlugin::CFG_NC_GLOBAL_FOLDERS);
+        $t_nc_base         = isset($t_base_urls[0]) ? (string) $t_base_urls[0] : '';
+
+        $t_nc_scope   = NextcloudScopeConfig::forProject($t_nc_proj_folders, $t_nc_glob_folders, $t_current_project);
+        $t_nc_gateway = ($t_nc_auth_mode === 'service_account'
+            && $t_nc_svc_user !== '' && $t_nc_svc_pass !== '' && $t_nc_base !== '')
+            ? new WebDavNextcloudGateway($t_nc_base, $t_nc_svc_user, $t_nc_svc_pass)
+            : null;
+        $t_nc_picker = new NextcloudPickerService($t_access, $t_service, $t_nc_gateway, $t_nc_scope, $t_nc_base);
+
         // "Add link" is offered on all projects by default; an explicit list
         // restricts it. Same failing-closed semantics as the customer flow: an
         // unknown current project (0) is offered only when the list is empty.
@@ -142,6 +163,7 @@ if (!function_exists('imatic_el_container')) {
             $t_access,
             $t_service,
             $t_customer_picker,
+            $t_nc_picker,
             new JsonResponder(),
             $t_links_offered
         );

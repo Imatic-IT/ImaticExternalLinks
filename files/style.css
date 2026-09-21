@@ -272,3 +272,60 @@
     font-size: 12px;
     color: #888;
 }
+
+/* Nextcloud file picker */
+.imatic-el-nc-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.imatic-el-nc-path {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: monospace;
+    font-size: 12px;
+    color: #555;
+}
+
+.imatic-el-nc-entry {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    border-bottom: 1px solid #f0f0f0;
+    padding: 7px 4px;
+    cursor: pointer;
+}
+
+.imatic-el-nc-entry:hover {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.imatic-el-nc-icon {
+    flex: 0 0 auto;
+    width: 16px;
+    text-align: center;
+    color: #6a8bad;
+}
+
+.imatic-el-nc-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.imatic-el-nc-attach {
+    flex: 0 0 auto;
+    font-size: 11px;
+    color: #888;
+}

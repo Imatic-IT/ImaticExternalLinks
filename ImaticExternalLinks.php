@@ -26,6 +26,12 @@ class ImaticExternalLinksPlugin extends MantisPlugin
     public const CFG_PROXY_ALLOW      = 'proxy_allow_list';
     public const CFG_NC_AUTH_MODE     = 'nc_auth_mode';
     public const CFG_NC_EDITOR        = 'nc_online_editor';
+    /** Nextcloud service-account credentials for the file picker (WebDAV). */
+    public const CFG_NC_SERVICE_USER     = 'nc_service_user';
+    public const CFG_NC_SERVICE_PASSWORD = 'nc_service_password';
+    /** Folder scoping for the picker: per-project map + global fallback. */
+    public const CFG_NC_PROJECT_FOLDERS  = 'nc_project_folders';
+    public const CFG_NC_GLOBAL_FOLDERS   = 'nc_global_folders';
     /** Project id holding customer issues (0 = customer provider disabled). */
     public const CFG_CUSTOMERS_PROJECT = 'customers_project_id';
     /** Map of meta key => Mantis custom field name for customer invoicing data. */
@@ -65,6 +71,10 @@ class ImaticExternalLinksPlugin extends MantisPlugin
             self::CFG_PROXY_ALLOW      => [],
             self::CFG_NC_AUTH_MODE     => 'off',
             self::CFG_NC_EDITOR        => 'collabora',
+            self::CFG_NC_SERVICE_USER     => '',
+            self::CFG_NC_SERVICE_PASSWORD => '',
+            self::CFG_NC_PROJECT_FOLDERS  => [],
+            self::CFG_NC_GLOBAL_FOLDERS   => [],
             self::CFG_CUSTOMERS_PROJECT => 0,
             self::CFG_CUSTOMER_FIELDS  => [
                 'ico'           => 'IČO',
@@ -164,6 +174,8 @@ class ImaticExternalLinksPlugin extends MantisPlugin
                 'lang'              => $this->langStrings(),
                 'backlinks'         => $this->backlinks($t_container, $t_bug_id),
                 'relStatuses'       => $this->relationshipStatuses($t_bug_id),
+                'nextcloudPickerEnabled' => $t_container->nextcloudPicker->isEnabled(),
+                'nextcloudBrowseUrl'     => plugin_page('ajax_nc_browse.php'),
             ];
 
             $t_json = json_encode($t_config, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
@@ -257,6 +269,10 @@ class ImaticExternalLinksPlugin extends MantisPlugin
             'imatic_el_action_open_editor',
             'imatic_el_action_open_customer',
             'imatic_el_add_customer_btn',
+            'imatic_el_nc_add_btn',
+            'imatic_el_nc_up',
+            'imatic_el_nc_empty',
+            'imatic_el_nc_attach',
             'imatic_el_customer_search_placeholder',
             'imatic_el_customer_ico',
             'imatic_el_customer_dic',

@@ -7,6 +7,7 @@ import {
   LinkListSchema,
   LinkRow,
 } from '../contracts/link';
+import { NcBrowseResponse, NcBrowseResponseSchema } from '../contracts/nextcloud';
 import { request } from './client';
 
 /**
@@ -52,6 +53,25 @@ export class LinksApi {
       this.config.customerSearchUrl,
     );
     return res.customers;
+  }
+
+  /** List a Nextcloud folder within the project's allowed scope. */
+  async browseNextcloud(path: string): Promise<NcBrowseResponse> {
+    return this.post(
+      { action: 'browse', path },
+      NcBrowseResponseSchema,
+      this.config.nextcloudBrowseUrl,
+    );
+  }
+
+  /** Attach a picked Nextcloud file (by its in-scope path); returns the new row. */
+  async attachNextcloud(path: string): Promise<LinkRow> {
+    const res = await this.post(
+      { action: 'attach', path },
+      AddLinkResponseSchema,
+      this.config.nextcloudBrowseUrl,
+    );
+    return res.link;
   }
 
   private post<S extends z.ZodTypeAny>(
