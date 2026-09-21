@@ -183,7 +183,7 @@ print_manage_menu('manage_plugin_page.php');
 <div class="space-10"></div>
 <div class="widget-box widget-color-blue2">
     <div class="widget-header widget-header-small">
-        <h4 class="widget-title lighter">ImaticExternalLinks — Configuration</h4>
+        <h4 class="widget-title lighter"><?php echo string_display_line(lang_get('imatic_el_cfg_title')) ?></h4>
     </div>
     <div class="widget-body">
         <div class="widget-main no-padding">
@@ -194,165 +194,169 @@ print_manage_menu('manage_plugin_page.php');
                     <table class="table table-bordered table-condensed">
                         <tbody>
                             <tr>
-                                <th class="category" width="30%">Enabled</th>
+                                <th class="category" width="30%"><?php echo string_display_line(lang_get('imatic_el_cfg_enabled')) ?></th>
                                 <td>
                                     <input type="checkbox" name="enabled" value="1" <?php echo $t_enabled ? 'checked' : '' ?> />
-                                    <span class="small">Show the external-links section on issue pages.</span>
+                                    <span class="small"><?php echo string_display_line(lang_get('imatic_el_cfg_enabled_help')) ?></span>
                                 </td>
                             </tr>
                             <tr>
-                                <th class="category">View threshold</th>
+                                <th class="category"><?php echo string_display_line(lang_get('imatic_el_cfg_view')) ?></th>
                                 <td>
                                     <?php imatic_el_level_select('view_threshold', $t_view, $t_access_levels) ?>
-                                    <span class="small">Minimum access level to see links.</span>
+                                    <span class="small"><?php echo string_display_line(lang_get('imatic_el_cfg_view_help')) ?></span>
                                 </td>
                             </tr>
                             <tr>
-                                <th class="category">Manage threshold</th>
+                                <th class="category"><?php echo string_display_line(lang_get('imatic_el_cfg_manage')) ?></th>
                                 <td>
                                     <?php imatic_el_level_select('manage_threshold', $t_manage, $t_access_levels) ?>
-                                    <span class="small">Minimum access level to add / delete links.</span>
+                                    <span class="small"><?php echo string_display_line(lang_get('imatic_el_cfg_manage_help')) ?></span>
                                 </td>
                             </tr>
                             <tr>
-                                <th class="category">Nextcloud base URLs</th>
+                                <th class="category"><?php echo string_display_line(lang_get('imatic_el_cfg_base_urls')) ?></th>
                                 <td>
                                     <textarea name="nextcloud_base_urls" rows="3" class="form-control" placeholder="https://cloud.example.com"><?php echo htmlspecialchars(implode("\n", $t_base_urls), ENT_QUOTES, 'UTF-8') ?></textarea>
-                                    <span class="small">One origin per line. Only these origins are treated as Nextcloud links.</span>
+                                    <span class="small"><?php echo string_display_line(lang_get('imatic_el_cfg_base_urls_help')) ?></span>
                                 </td>
                             </tr>
                             <tr>
-                                <th class="category">Proxy allow-list</th>
+                                <th class="category"><?php echo string_display_line(lang_get('imatic_el_cfg_proxy')) ?></th>
                                 <td>
                                     <textarea name="proxy_allow_list" rows="3" class="form-control" placeholder="https://cloud.example.com"><?php echo htmlspecialchars(implode("\n", $t_proxy_allow), ENT_QUOTES, 'UTF-8') ?></textarea>
-                                    <span class="small">One origin per line. Origins the server may fetch for enrichment (SSRF guard). Empty = Nextcloud URLs only.</span>
+                                    <span class="small"><?php echo string_display_line(lang_get('imatic_el_cfg_proxy_help')) ?></span>
                                 </td>
                             </tr>
                             <tr>
-                                <th class="category">Nextcloud auth mode</th>
+                                <th class="category"><?php echo string_display_line(lang_get('imatic_el_cfg_auth')) ?></th>
                                 <td>
                                     <select name="nc_auth_mode">
                                         <?php foreach (['off', 'per_user', 'service_account'] as $t_mode): ?>
                                             <option value="<?php echo $t_mode ?>" <?php echo $t_auth_mode === $t_mode ? 'selected' : '' ?>><?php echo $t_mode ?></option>
                                         <?php endforeach; ?>
                                     </select>
-                                    <span class="small">How the server authenticates to Nextcloud for enrichment / browsing (Phase 3).</span>
+                                    <span class="small"><?php echo string_display_line(lang_get('imatic_el_cfg_auth_help')) ?></span>
                                 </td>
                             </tr>
                             <tr>
-                                <th class="category">Online editor</th>
+                                <th class="category"><?php echo string_display_line(lang_get('imatic_el_cfg_editor')) ?></th>
                                 <td>
                                     <select name="nc_online_editor">
                                         <?php foreach (['collabora', 'onlyoffice'] as $t_ed): ?>
                                             <option value="<?php echo $t_ed ?>" <?php echo $t_editor === $t_ed ? 'selected' : '' ?>><?php echo $t_ed ?></option>
                                         <?php endforeach; ?>
                                     </select>
-                                    <span class="small">Editor used for the "open in editor" action on office files.</span>
+                                    <span class="small"><?php echo string_display_line(lang_get('imatic_el_cfg_editor_help')) ?></span>
                                 </td>
                             </tr>
                             <tr>
-                                <th class="category">NC service account</th>
+                                <th class="category"><?php echo string_display_line(lang_get('imatic_el_cfg_nc_account')) ?></th>
                                 <td>
                                     <input type="text" name="nc_service_user" class="form-control" autocomplete="off"
                                            value="<?php echo htmlspecialchars($t_nc_service_user, ENT_QUOTES, 'UTF-8') ?>"
                                            placeholder="mantis" />
                                     <input type="password" name="nc_service_password" class="form-control" autocomplete="new-password"
-                                           placeholder="<?php echo $t_nc_has_password ? '•••••••• (uloženo — ponechte prázdné)' : 'app password' ?>" />
-                                    <span class="small">Service-account user + app password for the Nextcloud file picker (WebDAV). Used only when auth mode = <code>service_account</code>. Leave the password blank to keep the stored one.</span>
+                                           placeholder="<?php echo htmlspecialchars($t_nc_has_password ? lang_get('imatic_el_cfg_pw_stored') : lang_get('imatic_el_cfg_pw_placeholder'), ENT_QUOTES, 'UTF-8') ?>" />
+                                    <span class="small"><?php echo string_display_line(lang_get('imatic_el_cfg_nc_account_help')) ?></span>
                                 </td>
                             </tr>
                             <tr>
-                                <th class="category">NC folders — global</th>
+                                <th class="category"><?php echo string_display_line(lang_get('imatic_el_cfg_folders_global')) ?></th>
                                 <td>
                                     <textarea name="nc_global_folders" rows="3" class="form-control" placeholder="/Sdilene"><?php echo htmlspecialchars(implode("\n", $t_nc_global_folders), ENT_QUOTES, 'UTF-8') ?></textarea>
-                                    <span class="small">One folder path per line. Fallback scope for projects without their own mapping. Empty = picker off there.</span>
+                                    <span class="small"><?php echo string_display_line(lang_get('imatic_el_cfg_folders_global_help')) ?></span>
                                 </td>
                             </tr>
                             <tr>
-                                <th class="category">NC folders — per project</th>
+                                <th class="category"><?php echo string_display_line(lang_get('imatic_el_cfg_folders_project')) ?></th>
                                 <td>
                                     <div id="imatic-el-ncpf" data-browse-url="<?php echo htmlspecialchars(plugin_page('ajax_nc_config_browse.php'), ENT_QUOTES, 'UTF-8') ?>">
                                         <?php foreach ($t_nc_project_folders as $t_pf_pid => $t_pf_folder): ?>
                                             <div class="imatic-el-ncpf-row">
-                                                <select name="nc_pf_pid[]" class="imatic-el-ncpf-project" data-placeholder="Vyber projekt…">
+                                                <select name="nc_pf_pid[]" class="imatic-el-ncpf-project" data-placeholder="<?php echo htmlspecialchars(lang_get('imatic_el_cfg_pick_project'), ENT_QUOTES, 'UTF-8') ?>">
                                                     <option value="0"></option>
                                                     <?php print_project_option_list((int) $t_pf_pid, false) ?>
                                                 </select>
                                                 <input type="text" name="nc_pf_path[]" class="imatic-el-ncpf-path form-control"
                                                        value="<?php echo htmlspecialchars((string) $t_pf_folder, ENT_QUOTES, 'UTF-8') ?>"
                                                        placeholder="/Zakaznici" />
-                                                <button type="button" class="btn btn-xs btn-white btn-round imatic-el-ncpf-browse" title="Procházet Nextcloud"><i class="ace-icon fa fa-folder-open"></i></button>
-                                                <button type="button" class="btn btn-xs btn-white btn-round imatic-el-ncpf-del" title="Odebrat">&times;</button>
+                                                <button type="button" class="btn btn-xs btn-white btn-round imatic-el-ncpf-browse" title="<?php echo htmlspecialchars(lang_get('imatic_el_cfg_browse'), ENT_QUOTES, 'UTF-8') ?>"><i class="ace-icon fa fa-folder-open"></i></button>
+                                                <button type="button" class="btn btn-xs btn-white btn-round imatic-el-ncpf-del" title="<?php echo htmlspecialchars(lang_get('imatic_el_cfg_remove'), ENT_QUOTES, 'UTF-8') ?>">&times;</button>
                                             </div>
                                         <?php endforeach; ?>
                                     </div>
-                                    <button type="button" class="btn btn-xs btn-white btn-round" id="imatic-el-ncpf-add">+ přidat mapování</button>
-                                    <span class="small">Vyber projekt a zvol jeho NC složku (tlačítko <i class="ace-icon fa fa-folder-open"></i> Procházet, nebo napiš cestu). Ten projekt pak v pickeru prochází jen tento podstrom; ostatní projekty použijí globální fallback.</span>
+                                    <button type="button" class="btn btn-xs btn-white btn-round" id="imatic-el-ncpf-add"><?php echo string_display_line(lang_get('imatic_el_cfg_add_mapping')) ?></button>
+                                    <span class="small"><?php echo string_display_line(lang_get('imatic_el_cfg_folders_project_help')) ?></span>
 
                                     <template id="imatic-el-ncpf-template">
                                         <div class="imatic-el-ncpf-row">
-                                            <select name="nc_pf_pid[]" class="imatic-el-ncpf-project" data-placeholder="Vyber projekt…">
+                                            <select name="nc_pf_pid[]" class="imatic-el-ncpf-project" data-placeholder="<?php echo htmlspecialchars(lang_get('imatic_el_cfg_pick_project'), ENT_QUOTES, 'UTF-8') ?>">
                                                 <option value="0"></option>
                                                 <?php print_project_option_list(0, false) ?>
                                             </select>
                                             <input type="text" name="nc_pf_path[]" class="imatic-el-ncpf-path form-control" placeholder="/Zakaznici" />
-                                            <button type="button" class="btn btn-xs btn-white btn-round imatic-el-ncpf-browse" title="Procházet Nextcloud"><i class="ace-icon fa fa-folder-open"></i></button>
-                                            <button type="button" class="btn btn-xs btn-white btn-round imatic-el-ncpf-del" title="Odebrat">&times;</button>
+                                            <button type="button" class="btn btn-xs btn-white btn-round imatic-el-ncpf-browse" title="<?php echo htmlspecialchars(lang_get('imatic_el_cfg_browse'), ENT_QUOTES, 'UTF-8') ?>"><i class="ace-icon fa fa-folder-open"></i></button>
+                                            <button type="button" class="btn btn-xs btn-white btn-round imatic-el-ncpf-del" title="<?php echo htmlspecialchars(lang_get('imatic_el_cfg_remove'), ENT_QUOTES, 'UTF-8') ?>">&times;</button>
                                         </div>
                                     </template>
 
-                                    <div id="imatic-el-ncbrowse" class="imatic-el-ncbrowse" hidden>
+                                    <div id="imatic-el-ncbrowse" class="imatic-el-ncbrowse" hidden
+                                         data-i18n-loading="<?php echo htmlspecialchars(lang_get('imatic_el_cfg_loading'), ENT_QUOTES, 'UTF-8') ?>"
+                                         data-i18n-empty="<?php echo htmlspecialchars(lang_get('imatic_el_cfg_no_subfolders'), ENT_QUOTES, 'UTF-8') ?>"
+                                         data-i18n-error="<?php echo htmlspecialchars(lang_get('imatic_el_cfg_error'), ENT_QUOTES, 'UTF-8') ?>"
+                                         data-i18n-connerr="<?php echo htmlspecialchars(lang_get('imatic_el_cfg_conn_error'), ENT_QUOTES, 'UTF-8') ?>">
                                         <div class="imatic-el-ncbrowse-box">
                                             <div class="imatic-el-ncbrowse-bar">
-                                                <button type="button" class="btn btn-xs btn-white btn-round" id="imatic-el-ncbrowse-up"><i class="ace-icon fa fa-level-up"></i> Nahoru</button>
+                                                <button type="button" class="btn btn-xs btn-white btn-round" id="imatic-el-ncbrowse-up"><i class="ace-icon fa fa-level-up"></i> <?php echo string_display_line(lang_get('imatic_el_cfg_up')) ?></button>
                                                 <span class="imatic-el-ncbrowse-path"></span>
-                                                <button type="button" class="btn btn-xs btn-white btn-round" id="imatic-el-ncbrowse-cancel">Zavřít</button>
+                                                <button type="button" class="btn btn-xs btn-white btn-round" id="imatic-el-ncbrowse-cancel"><?php echo string_display_line(lang_get('imatic_el_cfg_close')) ?></button>
                                             </div>
                                             <ul class="imatic-el-ncbrowse-list"></ul>
                                             <div class="imatic-el-ncbrowse-actions">
-                                                <button type="button" class="btn btn-xs btn-primary btn-round" id="imatic-el-ncbrowse-pick">Vybrat tuto složku</button>
+                                                <button type="button" class="btn btn-xs btn-primary btn-round" id="imatic-el-ncbrowse-pick"><?php echo string_display_line(lang_get('imatic_el_cfg_pick_folder')) ?></button>
                                             </div>
                                         </div>
                                     </div>
                                 </td>
                             </tr>
                             <tr>
-                                <th class="category">Customers project</th>
+                                <th class="category"><?php echo string_display_line(lang_get('imatic_el_cfg_customers_project')) ?></th>
                                 <td>
                                     <select name="customers_project_id">
-                                        <option value="0"<?php echo $t_customers_pid === 0 ? ' selected' : '' ?>>— disabled —</option>
+                                        <option value="0"<?php echo $t_customers_pid === 0 ? ' selected' : '' ?>><?php echo string_display_line(lang_get('imatic_el_cfg_disabled_opt')) ?></option>
                                         <?php print_project_option_list($t_customers_pid, false) ?>
                                     </select>
-                                    <span class="small">Project holding customer records. Enables the "add customer" flow.</span>
+                                    <span class="small"><?php echo string_display_line(lang_get('imatic_el_cfg_customers_project_help')) ?></span>
                                 </td>
                             </tr>
                             <tr>
-                                <th class="category">Customer fields</th>
+                                <th class="category"><?php echo string_display_line(lang_get('imatic_el_cfg_customer_fields')) ?></th>
                                 <td>
                                     <textarea name="customer_fields" rows="5" class="form-control" placeholder="ico = IČO"><?php echo htmlspecialchars(rtrim($t_fields_text), ENT_QUOTES, 'UTF-8') ?></textarea>
-                                    <span class="small">One "meta_key = Mantis custom field name" per line, for invoicing enrichment.</span>
+                                    <span class="small"><?php echo string_display_line(lang_get('imatic_el_cfg_customer_fields_help')) ?></span>
                                 </td>
                             </tr>
                             <tr>
-                                <th class="category">Offer "add link" on</th>
+                                <th class="category"><?php echo string_display_line(lang_get('imatic_el_cfg_offer_link')) ?></th>
                                 <td>
                                     <select name="links_enabled_projects[]" id="imatic-el-links-projects" multiple
-                                            class="form-control imatic-el-project-select" data-placeholder="Hledat projekt…">
+                                            class="form-control imatic-el-project-select" data-placeholder="<?php echo htmlspecialchars(lang_get('imatic_el_cfg_search_project'), ENT_QUOTES, 'UTF-8') ?>">
                                         <?php print_project_option_list($t_links_enabled, false) ?>
                                     </select>
-                                    <span class="small">Projects where the "add link" button appears. Select none = every project.</span>
+                                    <span class="small"><?php echo string_display_line(lang_get('imatic_el_cfg_offer_link_help')) ?></span>
                                 </td>
                             </tr>
                             <tr>
-                                <th class="category">Offer "add customer" on</th>
+                                <th class="category"><?php echo string_display_line(lang_get('imatic_el_cfg_offer_customer')) ?></th>
                                 <td>
                                     <select name="customer_enabled_projects[]" id="imatic-el-customer-projects" multiple
-                                            class="form-control imatic-el-project-select" data-placeholder="Hledat projekt…">
+                                            class="form-control imatic-el-project-select" data-placeholder="<?php echo htmlspecialchars(lang_get('imatic_el_cfg_search_project'), ENT_QUOTES, 'UTF-8') ?>">
                                         <?php // Core helper: only accessible projects, ordered hierarchically with
                                               // subprojects indented — same order as the project menu. ?>
                                         <?php print_project_option_list($t_customer_enabled, false) ?>
                                     </select>
-                                    <span class="small">Projects where the "add customer" button appears. Select none = every project.</span>
+                                    <span class="small"><?php echo string_display_line(lang_get('imatic_el_cfg_offer_customer_help')) ?></span>
                                 </td>
                             </tr>
                         </tbody>
@@ -361,7 +365,7 @@ print_manage_menu('manage_plugin_page.php');
 
                 <div class="widget-toolbox padding-8">
                     <input type="hidden" name="save" value="1" />
-                    <input type="submit" class="btn btn-primary btn-sm btn-white btn-round" value="Save" />
+                    <input type="submit" class="btn btn-primary btn-sm btn-white btn-round" value="<?php echo htmlspecialchars(lang_get('imatic_el_cfg_save'), ENT_QUOTES, 'UTF-8') ?>" />
                 </div>
 
             </form>

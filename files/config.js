@@ -66,6 +66,12 @@
             return;
         }
         var browseUrl = container.getAttribute('data-browse-url');
+        var i18n = {
+            loading: modal.getAttribute('data-i18n-loading') || 'Loading…',
+            empty: modal.getAttribute('data-i18n-empty') || 'No subfolders.',
+            error: modal.getAttribute('data-i18n-error') || 'Error',
+            connerr: modal.getAttribute('data-i18n-connerr') || 'Connection error.'
+        };
         var listEl = modal.querySelector('.imatic-el-ncbrowse-list');
         var pathEl = modal.querySelector('.imatic-el-ncbrowse-path');
         var upBtn = modal.querySelector('#imatic-el-ncbrowse-up');
@@ -96,7 +102,7 @@
             if (!entries.length) {
                 var empty = document.createElement('li');
                 empty.className = 'imatic-el-ncbrowse-empty';
-                empty.textContent = 'Žádné podsložky.';
+                empty.textContent = i18n.empty;
                 listEl.appendChild(empty);
                 return;
             }
@@ -116,7 +122,7 @@
             current = path || '/';
             pathEl.textContent = current;
             setLoading(true);
-            listEl.innerHTML = '<li class="imatic-el-ncbrowse-empty"><i class="ace-icon fa fa-spinner fa-spin"></i> Načítání…</li>';
+            listEl.innerHTML = '<li class="imatic-el-ncbrowse-empty"><i class="ace-icon fa fa-spinner fa-spin"></i> ' + i18n.loading + '</li>';
             var myReq = ++reqId;
             var body = new URLSearchParams();
             body.set('path', path);
@@ -130,7 +136,7 @@
                     if (myReq !== reqId) { return; } // superseded by a newer navigation
                     setLoading(false);
                     if (!res.ok) {
-                        listEl.innerHTML = '<li class="imatic-el-ncbrowse-empty">' + (res.j && res.j.error ? res.j.error : 'Chyba') + '</li>';
+                        listEl.innerHTML = '<li class="imatic-el-ncbrowse-empty">' + (res.j && res.j.error ? res.j.error : i18n.error) + '</li>';
                         return;
                     }
                     current = res.j.path || '/';
@@ -141,7 +147,7 @@
                 .catch(function () {
                     if (myReq !== reqId) { return; }
                     setLoading(false);
-                    listEl.innerHTML = '<li class="imatic-el-ncbrowse-empty">Chyba připojení.</li>';
+                    listEl.innerHTML = '<li class="imatic-el-ncbrowse-empty">' + i18n.connerr + '</li>';
                 });
         }
 
