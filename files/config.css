@@ -1,0 +1,30 @@
+/* ImaticExternalLinks config page — per-project Nextcloud folder mapping rows.
+   Loaded via <link> (CSP-safe, style-src 'self'); keeps the row layout tidy
+   without inline styles. */
+
+#imatic-el-ncpf {
+    margin-bottom: 6px;
+}
+
+.imatic-el-ncpf-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+/* The project select2 takes ~half, the folder input the rest. */
+.imatic-el-ncpf-row .imatic-el-ncpf-project,
+.imatic-el-ncpf-row .select2-container {
+    flex: 1 1 45%;
+    min-width: 160px;
+}
+
+.imatic-el-ncpf-row .imatic-el-ncpf-path {
+    flex: 1 1 45%;
+    min-width: 160px;
+}
+
+.imatic-el-ncpf-del {
+    flex: 0 0 auto;
+}

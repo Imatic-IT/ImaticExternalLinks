@@ -111,7 +111,21 @@ if (gpc_get_bool('save', false)) {
         plugin_config_set(ImaticExternalLinksPlugin::CFG_NC_SERVICE_PASSWORD, $t_nc_password);
     }
     plugin_config_set(ImaticExternalLinksPlugin::CFG_NC_GLOBAL_FOLDERS, imatic_el_parse_lines(gpc_get_string('nc_global_folders', '')));
-    plugin_config_set(ImaticExternalLinksPlugin::CFG_NC_PROJECT_FOLDERS, imatic_el_parse_map(gpc_get_string('nc_project_folders', '')));
+
+    // Per-project folder mapping comes from paired row inputs (project select +
+    // folder path). Zip them into a { projectId => folder } map, dropping rows
+    // with no project or an empty path. A project chosen twice → last wins.
+    $t_pf_pids  = gpc_get_int_array('nc_pf_pid', []);
+    $t_pf_paths = gpc_get_string_array('nc_pf_path', []);
+    $t_pf_map   = [];
+    foreach ($t_pf_pids as $t_i => $t_pf_pid) {
+        $t_pf_pid  = (int) $t_pf_pid;
+        $t_pf_path = isset($t_pf_paths[$t_i]) ? trim((string) $t_pf_paths[$t_i]) : '';
+        if ($t_pf_pid > 0 && $t_pf_path !== '') {
+            $t_pf_map[(string) $t_pf_pid] = $t_pf_path;
+        }
+    }
+    plugin_config_set(ImaticExternalLinksPlugin::CFG_NC_PROJECT_FOLDERS, $t_pf_map);
 
     form_security_purge('plugin_imatic_external_links_config');
     print_successful_redirect(plugin_page('config', true));
@@ -257,8 +271,33 @@ print_manage_menu('manage_plugin_page.php');
                             <tr>
                                 <th class="category">NC folders — per project</th>
                                 <td>
-                                    <textarea name="nc_project_folders" rows="4" class="form-control" placeholder="406 = /Zakaznici"><?php echo htmlspecialchars(rtrim($t_nc_project_text), ENT_QUOTES, 'UTF-8') ?></textarea>
-                                    <span class="small">One "<code>projectId = /folder</code>" per line. That project's picker browses only this subtree; others use the global fallback.</span>
+                                    <div id="imatic-el-ncpf">
+                                        <?php foreach ($t_nc_project_folders as $t_pf_pid => $t_pf_folder): ?>
+                                            <div class="imatic-el-ncpf-row">
+                                                <select name="nc_pf_pid[]" class="imatic-el-ncpf-project" data-placeholder="Vyber projekt…">
+                                                    <option value="0"></option>
+                                                    <?php print_project_option_list((int) $t_pf_pid, false) ?>
+                                                </select>
+                                                <input type="text" name="nc_pf_path[]" class="imatic-el-ncpf-path form-control"
+                                                       value="<?php echo htmlspecialchars((string) $t_pf_folder, ENT_QUOTES, 'UTF-8') ?>"
+                                                       placeholder="/Zakaznici" />
+                                                <button type="button" class="btn btn-xs btn-white btn-round imatic-el-ncpf-del" title="Odebrat">&times;</button>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                    <button type="button" class="btn btn-xs btn-white btn-round" id="imatic-el-ncpf-add">+ přidat mapování</button>
+                                    <span class="small">Vyber projekt a zadej jeho NC složku. Ten projekt pak v pickeru prochází jen tento podstrom; ostatní projekty použijí globální fallback.</span>
+
+                                    <template id="imatic-el-ncpf-template">
+                                        <div class="imatic-el-ncpf-row">
+                                            <select name="nc_pf_pid[]" class="imatic-el-ncpf-project" data-placeholder="Vyber projekt…">
+                                                <option value="0"></option>
+                                                <?php print_project_option_list(0, false) ?>
+                                            </select>
+                                            <input type="text" name="nc_pf_path[]" class="imatic-el-ncpf-path form-control" placeholder="/Zakaznici" />
+                                            <button type="button" class="btn btn-xs btn-white btn-round imatic-el-ncpf-del" title="Odebrat">&times;</button>
+                                        </div>
+                                    </template>
                                 </td>
                             </tr>
                             <tr>
@@ -321,6 +360,7 @@ print_manage_menu('manage_plugin_page.php');
 // stray click can't wipe the whole selection.
 ?>
 <link rel="stylesheet" type="text/css" href="<?php echo htmlspecialchars(plugin_file('vendor/select2.min.css'), ENT_QUOTES, 'UTF-8') ?>" />
+<link rel="stylesheet" type="text/css" href="<?php echo htmlspecialchars(plugin_file('config.css'), ENT_QUOTES, 'UTF-8') ?>" />
 <script src="<?php echo htmlspecialchars(plugin_file('vendor/select2.full.min.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
 
 <?php
