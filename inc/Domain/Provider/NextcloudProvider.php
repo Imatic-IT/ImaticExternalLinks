@@ -137,7 +137,7 @@ final class NextcloudProvider implements LinkProvider
         if ($fileId !== '' && $mime !== '' && self::isOfficeMime($mime)) {
             $origin = UrlNormalizer::origin($url);
             if ($origin !== null) {
-                $editorUrl = $origin . '/f/' . rawurlencode($fileId) . '?openfile=true';
+                $editorUrl = $origin . '/index.php/f/' . rawurlencode($fileId) . '?openfile=true';
                 $actions[] = new LinkAction('imatic_el_action_open_editor', $editorUrl, 'editor', true);
             }
         }

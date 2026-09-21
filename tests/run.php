@@ -535,7 +535,7 @@ $withEditor = $ncp->actions([
 ]);
 eq(2, count($withEditor), 'office file gets open + editor actions');
 eq('imatic_el_action_open_editor', $withEditor[1]->label, 'second action is editor');
-eq('https://cloud.example.com/f/42?openfile=true', $withEditor[1]->url, 'editor url built from origin + fileid');
+eq('https://cloud.example.com/index.php/f/42?openfile=true', $withEditor[1]->url, 'editor url built from origin + fileid (via index.php)');
 
 // enrich: gateway metadata sanitized into LinkMeta
 $gw = new StubNextcloudGateway(['name' => 'notes.odt', 'mime' => 'application/vnd.oasis.opendocument.text', 'size' => '55', 'junk' => 'x']);
@@ -1005,7 +1005,7 @@ try {
 ok($brwDenied, 'browse refuses out-of-scope path');
 
 $attached = $ncPicker->attach(1, '/Zakaznici/a.pdf');
-eq($ncBase . '/f/42', $attached['url'], 'attach builds /f/<id> link');
+eq($ncBase . '/index.php/f/42', $attached['url'], 'attach builds /index.php/f/<id> link');
 eq('a.pdf', $attached['title'], 'attach stores file name as title');
 eq('nextcloud', $attached['provider'], 'attach resolves the Nextcloud provider');
 eq('application/pdf', $attached['meta']['mime'] ?? '', 'attach persists mime in meta');

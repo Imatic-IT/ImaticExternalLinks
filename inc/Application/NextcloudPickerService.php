@@ -125,10 +125,12 @@ final class NextcloudPickerService
             ? (string) $t_stat['name']
             : basename($t_resolved);
 
-        // Stable, user-openable link. `/f/<id>` survives renames/moves and opens
-        // the file in the viewer's own Nextcloud session.
+        // Stable, user-openable link. `/index.php/f/<id>` survives renames/moves
+        // and opens the file in the viewer's own Nextcloud session. We route via
+        // index.php explicitly: instances without the pretty-URL rewrite return a
+        // hard 404 on a bare `/f/<id>`.
         $t_url = $t_fileId !== ''
-            ? $this->baseUrl . '/f/' . rawurlencode($t_fileId)
+            ? $this->baseUrl . '/index.php/f/' . rawurlencode($t_fileId)
             : $this->baseUrl . '/remote.php/dav/files' . $t_resolved;
 
         $t_meta = [
