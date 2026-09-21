@@ -273,6 +273,7 @@ class ImaticExternalLinksPlugin extends MantisPlugin
             'imatic_el_nc_up',
             'imatic_el_nc_empty',
             'imatic_el_nc_attach',
+            'imatic_el_nc_loading',
             'imatic_el_customer_search_placeholder',
             'imatic_el_customer_ico',
             'imatic_el_customer_dic',

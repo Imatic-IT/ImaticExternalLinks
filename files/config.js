@@ -68,10 +68,14 @@
         var browseUrl = container.getAttribute('data-browse-url');
         var listEl = modal.querySelector('.imatic-el-ncbrowse-list');
         var pathEl = modal.querySelector('.imatic-el-ncbrowse-path');
+        var upBtn = modal.querySelector('#imatic-el-ncbrowse-up');
+        var pickBtn = modal.querySelector('#imatic-el-ncbrowse-pick');
         var tokenEl = document.querySelector('input[name="plugin_imatic_external_links_config_token"]');
         var token = tokenEl ? tokenEl.value : '';
         var current = '/';
-        var target = null; // the .imatic-el-ncpf-path input to fill
+        var target = null;   // the .imatic-el-ncpf-path input to fill
+        var loading = false; // block "select" while a listing is still loading
+        var reqId = 0;       // ignore responses from superseded requests
 
         function open(input) {
             target = input;
@@ -81,6 +85,11 @@
         function close() {
             modal.hidden = true;
             target = null;
+        }
+        function setLoading(on) {
+            loading = on;
+            pickBtn.disabled = on;
+            upBtn.disabled = on || current === '/';
         }
         function render(entries) {
             listEl.innerHTML = '';
@@ -97,30 +106,41 @@
                 icon.className = 'ace-icon fa fa-folder';
                 li.appendChild(icon);
                 li.appendChild(document.createTextNode(e.name));
-                li.addEventListener('click', function () { load(e.path); });
+                li.addEventListener('click', function () { if (!loading) { load(e.path); } });
                 listEl.appendChild(li);
             });
         }
         function load(path) {
+            // Commit the target path up-front so "Vybrat" is correct even if it's
+            // clicked before the listing finishes; the response confirms it.
+            current = path || '/';
+            pathEl.textContent = current;
+            setLoading(true);
+            listEl.innerHTML = '<li class="imatic-el-ncbrowse-empty"><i class="ace-icon fa fa-spinner fa-spin"></i> Načítání…</li>';
+            var myReq = ++reqId;
             var body = new URLSearchParams();
             body.set('path', path);
             body.set('plugin_imatic_external_links_config_token', token);
-            listEl.innerHTML = '<li class="imatic-el-ncbrowse-empty">…</li>';
             fetch(browseUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
                 body: body.toString()
             }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
                 .then(function (res) {
+                    if (myReq !== reqId) { return; } // superseded by a newer navigation
+                    setLoading(false);
                     if (!res.ok) {
                         listEl.innerHTML = '<li class="imatic-el-ncbrowse-empty">' + (res.j && res.j.error ? res.j.error : 'Chyba') + '</li>';
                         return;
                     }
                     current = res.j.path || '/';
                     pathEl.textContent = current;
+                    upBtn.disabled = current === '/';
                     render(res.j.entries || []);
                 })
                 .catch(function () {
+                    if (myReq !== reqId) { return; }
+                    setLoading(false);
                     listEl.innerHTML = '<li class="imatic-el-ncbrowse-empty">Chyba připojení.</li>';
                 });
         }
@@ -132,12 +152,13 @@
             var input = row && row.querySelector('.imatic-el-ncpf-path');
             if (input) { open(input); }
         });
-        modal.querySelector('#imatic-el-ncbrowse-up').addEventListener('click', function () {
-            if (current === '/') { return; }
+        upBtn.addEventListener('click', function () {
+            if (loading || current === '/') { return; }
             var parent = current.replace(/\/[^/]+$/, '');
             load(parent === '' ? '/' : parent);
         });
-        modal.querySelector('#imatic-el-ncbrowse-pick').addEventListener('click', function () {
+        pickBtn.addEventListener('click', function () {
+            if (loading) { return; }
             if (target) { target.value = current; }
             close();
         });

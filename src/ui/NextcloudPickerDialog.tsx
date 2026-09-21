@@ -76,7 +76,7 @@ export function NextcloudPickerDialog({ t, api, busy, onPick, onCancel }: Props)
         <button
           type="button"
           className="btn btn-xs btn-white btn-round"
-          disabled={history.length === 0 || loading}
+          disabled={history.length === 0 || loading || busy}
           onClick={goUp}
         >
           <i className="fa fa-level-up" aria-hidden="true" /> {t('imatic_el_nc_up')}
@@ -95,13 +95,17 @@ export function NextcloudPickerDialog({ t, api, busy, onPick, onCancel }: Props)
       </div>
 
       {error && <div className="imatic-el-inline-error">{error}</div>}
-      {loading && <div className="imatic-el-loading">…</div>}
+      {(loading || busy) && (
+        <div className="imatic-el-loading">
+          <i className="fa fa-spinner fa-spin" aria-hidden="true" /> {t('imatic_el_nc_loading')}
+        </div>
+      )}
 
-      {!loading && !error && entries.length === 0 && (
+      {!loading && !busy && !error && entries.length === 0 && (
         <div className="imatic-el-loading">{t('imatic_el_nc_empty')}</div>
       )}
 
-      {entries.length > 0 && (
+      {!loading && !busy && entries.length > 0 && (
         <ul className="imatic-el-customer-results imatic-el-nc-list">
           {entries.map((entry) =>
             entry.isDir ? (
@@ -109,7 +113,6 @@ export function NextcloudPickerDialog({ t, api, busy, onPick, onCancel }: Props)
                 <button
                   type="button"
                   className="imatic-el-nc-entry"
-                  disabled={loading}
                   onClick={() => openDir(entry.path)}
                 >
                   <i className="fa fa-folder imatic-el-nc-icon" aria-hidden="true" />
@@ -121,7 +124,6 @@ export function NextcloudPickerDialog({ t, api, busy, onPick, onCancel }: Props)
                 <button
                   type="button"
                   className="imatic-el-nc-entry"
-                  disabled={busy}
                   onClick={() => onPick(entry.path)}
                 >
                   <i className="fa fa-file-o imatic-el-nc-icon" aria-hidden="true" />

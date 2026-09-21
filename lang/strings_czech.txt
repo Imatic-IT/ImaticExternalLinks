@@ -29,6 +29,7 @@ $s_imatic_el_nc_add_btn                  = 'Připojit soubor z Nextcloudu';
 $s_imatic_el_nc_up                       = 'Nahoru';
 $s_imatic_el_nc_empty                    = 'Prázdná složka.';
 $s_imatic_el_nc_attach                   = 'Připojit';
+$s_imatic_el_nc_loading                  = 'Načítání…';
 $s_imatic_el_customer_search_placeholder = 'Hledat zákazníka…';
 $s_imatic_el_customer_ico                = 'IČO';
 $s_imatic_el_customer_dic                = 'DIČ';

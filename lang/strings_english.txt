@@ -29,6 +29,7 @@ $s_imatic_el_nc_add_btn                  = 'Attach Nextcloud file';
 $s_imatic_el_nc_up                       = 'Up';
 $s_imatic_el_nc_empty                    = 'Empty folder.';
 $s_imatic_el_nc_attach                   = 'Attach';
+$s_imatic_el_nc_loading                  = 'Loading…';
 $s_imatic_el_customer_search_placeholder = 'Search customer…';
 $s_imatic_el_customer_ico                = 'Reg. no. (IČO)';
 $s_imatic_el_customer_dic                = 'VAT no. (DIČ)';
